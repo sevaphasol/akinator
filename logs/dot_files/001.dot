@@ -1,0 +1,16 @@
+digraph G{
+rankdir=HR;
+node[color="red",fontsize=14];
+edge[color="#00eeee80",fontsize=12, penwidth=1];
+elem1[shape="Mrecord", label="{ 1 | data = 0 | left = 0x5ebe5528f2c0 | right = 0x5ebe5528f320 }"];
+elem1->elem2;elem2[shape="Mrecord", label="{ 2 | data = 0 | left = 0x5ebe5528f2e0 | right = 0x5ebe5528f300 }"];
+elem2->elem3;elem3[shape="Mrecord", label="{ 3 | data = 0 | left = (nil) | right = (nil) }"];
+elem2->elem4;elem4[shape="Mrecord", label="{ 4 | data = 0 | left = (nil) | right = (nil) }"];
+elem1->elem5;elem5[shape="Mrecord", label="{ 5 | data = 0 | left = 0x5ebe5528f340 | right = 0x5ebe5528f3e0 }"];
+elem5->elem6;elem6[shape="Mrecord", label="{ 6 | data = 0 | left = 0x5ebe5528f360 | right = 0x5ebe5528f380 }"];
+elem6->elem7;elem7[shape="Mrecord", label="{ 7 | data = 0 | left = (nil) | right = (nil) }"];
+elem6->elem8;elem8[shape="Mrecord", label="{ 8 | data = 0 | left = 0x5ebe5528f3a0 | right = 0x5ebe5528f3c0 }"];
+elem8->elem9;elem9[shape="Mrecord", label="{ 9 | data = 0 | left = (nil) | right = (nil) }"];
+elem8->elem10;elem10[shape="Mrecord", label="{ 10 | data = 0 | left = (nil) | right = (nil) }"];
+elem5->elem11;elem11[shape="Mrecord", label="{ 11 | data = 0 | left = (nil) | right = (nil) }"];
+}
