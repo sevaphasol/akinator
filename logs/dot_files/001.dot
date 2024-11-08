@@ -2,9 +2,15 @@ digraph G{
 rankdir=HR;
 node[color="red",fontsize=14];
 edge[color="#00eeee80",fontsize=12, penwidth=1];
-elem1[shape="Mrecord", label="{ 1 | data.is_question = true | data.str = yellow | left = 0x57f378715b10 | right = 0x57f378715b60 }"];
-elem1->elem2[label = "yes"];elem2[shape="Mrecord", label="{ 2 | data.is_question = true | data.str = fruit | left = 0x57f378715d90 | right = 0x57f378715de0 }"];
-elem2->elem3[label = "yes"];elem3[shape="Mrecord", label="{ 3 | data.is_question = false | data.str = banana | left = (nil) | right = (nil) }"];
-elem2->elem4[label = "no"];elem4[shape="Mrecord", label="{ 4 | data.is_question = false | data.str = minion | left = (nil) | right = (nil) }"];
-elem1->elem5[label = "no"];elem5[shape="Mrecord", label="{ 5 | data.is_question = false | data.str = huy | left = (nil) | right = (nil) }"];
+elem1[shape="Mrecord", label="{ 1 | data.is_question = true | data.str = Animal | left = 0x5e9f4f5c4620 | right = 0x5e9f4f5c4800 }"];
+elem1->elem2[label = "yes"];elem2[shape="Mrecord", label="{ 2 | data.is_question = true | data.str = Cat | left = 0x5e9f4f5c46c0 | right = 0x5e9f4f5c4760 }"];
+elem2->elem3[label = "yes"];elem3[shape="Mrecord", label="{ 3 | data.is_question = true | data.str = ti dalbaeb | left = 0x5e9f4f5c4a30 | right = 0x5e9f4f5c52f0 }"];
+elem3->elem4[label = "yes"];elem4[shape="Mrecord", label="{ 4 | data.is_question = false | data.str = мой хуй | left = (nil) | right = (nil) }"];
+elem3->elem5[label = "no"];elem5[shape="Mrecord", label="{ 5 | data.is_question = false | data.str = Polotarshka | left = (nil) | right = (nil) }"];
+elem2->elem6[label = "no"];elem6[shape="Mrecord", label="{ 6 | data.is_question = false | data.str = Pyos | left = (nil) | right = (nil) }"];
+elem1->elem7[label = "no"];elem7[shape="Mrecord", label="{ 7 | data.is_question = true | data.str = Matan | left = 0x5e9f4f5c48a0 | right = 0x5e9f4f5c4a80 }"];
+elem7->elem8[label = "yes"];elem8[shape="Mrecord", label="{ 8 | data.is_question = true | data.str = RT | left = 0x5e9f4f5c4940 | right = 0x5e9f4f5c49e0 }"];
+elem8->elem9[label = "yes"];elem9[shape="Mrecord", label="{ 9 | data.is_question = false | data.str = Korzh | left = (nil) | right = (nil) }"];
+elem8->elem10[label = "no"];elem10[shape="Mrecord", label="{ 10 | data.is_question = false | data.str = Kalinichenko | left = (nil) | right = (nil) }"];
+elem7->elem11[label = "no"];elem11[shape="Mrecord", label="{ 11 | data.is_question = false | data.str = Chivilev | left = (nil) | right = (nil) }"];
 }

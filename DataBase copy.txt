@@ -1,0 +1,9 @@
+q: Animal
+    q: Cat
+        a: Polotarshka
+        a: Pyos
+    q: Matan
+        q: RT
+           a: Korzh
+           a: Kalinichenko
+        a: Chivilev

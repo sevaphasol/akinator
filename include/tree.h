@@ -36,13 +36,12 @@ typedef struct Node
     Node*       right;
 } Node_t;
 
-typedef struct Tree
-{
-    size_t  size;
-    Node_t* root;
-    // Node_t* memory;
-    // int     free_place;
-} Tree_t;
+// typedef struct Tree
+// {
+//     size_t     size;
+//     Node_t*    root;
+//     DataBase_t db;
+// } Tree_t;
 
 Node_t*        NodeCtor();
 TreeReturnCode PrintGraphTree (Node_t*  node, int file_number);

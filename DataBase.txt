@@ -1,0 +1,11 @@
+q:Animal
+	q:Cat
+		q:ti dalbaeb
+			a:мой хуй
+			a:Polotarshka
+		a:Pyos
+	q:Matan
+		q:RT
+			a:Korzh
+			a:Kalinichenko
+		a:Chivilev
