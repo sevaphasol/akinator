@@ -1,9 +1,11 @@
-q: Animal
-    q: Cat
-        a: Polotarshka
-        a: Pyos
-    q: Matan
-        q: RT
-           a: Korzh
-           a: Kalinichenko
-        a: Chivilev
+q: Животное
+    a: Полторашка
+    q: Ведёт матан
+        a: Калиниченко
+        q: Ведёт физос
+            a: Чивилёв
+            q: Ведёт прогу
+                q: Ведёт прогу на РТ и СП
+                    a: Дед
+                    a: Хз кто
+                a: Киреев

@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 
-#include "tree.h"
+#include "akinator.h"
 
 /* Provided for reducing code size of checks in functions */
-#define DO_IF(condition, action)                       \
+#define VERIFY(condition, action)                      \
 if (condition)                                         \
 {                                                      \
     fprintf(stderr, "%s in %s:%d:%s\n",                \
@@ -18,15 +18,19 @@ const char* const DataBaseName = "DataBase.txt";
 
 typedef enum DataBaseStatus
 {
-    DB_SUCCESS,
+    DB_SUCCESS = 0,
     DB_FAILURE,
+    DB_STRUCT_NULL_PTR_ERROR,
+    DB_READ_FILE_ERROR,
     DB_NULL_PTR_ARG_ERROR,
     DB_GET_FILE_SIZE_ERROR,
+    DB_FILE_OPEN_ERROR,
+    DB_DATA_ALLOCATE_ERROR,
 } DataBaseStatus;
 
 typedef struct DataBase
 {
-    FILE*       input;
+    FILE*       file;
     size_t      size;
     char*       data;
     size_t      n_strings;
@@ -34,7 +38,7 @@ typedef struct DataBase
 } DataBase_t;
 
 DataBaseStatus ScanDB   (DataBase_t* db);
-DataBaseStatus ReadDB   (DataBase_t* db, Node_t* node, int* cur_string);
-DataBaseStatus UpdateDB (DataBase_t* db, Node_t* node, int* level);
+DataBaseStatus ReadDB   (DataBase_t* db, Node_t* root);
+DataBaseStatus UpdateDB (DataBase_t* db, Node_t* root);
 
 #endif // DATA_BASE_H__
