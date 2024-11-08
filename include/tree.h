@@ -12,16 +12,22 @@ if (condition)                                         \
     action;                                            \
 }                                                      \
 
-const size_t MinNumOfNodes = 256;
-const size_t BufSize       = 100;
-
-typedef int NodeData_t;
+const size_t MinNumOfNodes     = 256;
+const size_t FileNameBufSize   = 64;
+const size_t SysCommandBufSize = 278;
+const size_t NodeDataStrSize   = 128;
 
 typedef enum TreeReturnCode
 {
     TREE_SUCCESS,
     TREE_NULL_ARG_PTR_ERROR,
 } TreeReturnCode;
+
+typedef struct NodeData
+{
+    bool  is_question;
+    char* str;
+} NodeData_t;
 
 typedef struct Node
 {
@@ -34,14 +40,12 @@ typedef struct Tree
 {
     size_t  size;
     Node_t* root;
-    Node_t* memory;
-    int     free_place;
+    // Node_t* memory;
+    // int     free_place;
 } Tree_t;
 
-TreeReturnCode TreeCtor       (Tree_t** ret_tree_ptr, size_t n_nodes, Node_t* root);
-TreeReturnCode NodeCtor       (Node_t** ret_node_ptr);
-TreeReturnCode JoinNode       (Node_t*  node, Node_t* left, Node_t* right);
-TreeReturnCode PrintTextTree  (Node_t*  node);
+Node_t*        NodeCtor();
 TreeReturnCode PrintGraphTree (Node_t*  node, int file_number);
+TreeReturnCode StartGame      (Node_t* node);
 
 #endif // TREE_H__

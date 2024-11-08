@@ -1,100 +1,99 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 
 #include "tree.h"
 
-static TreeReturnCode MakeDotNode(Node_t* node, FILE* file, int* node_number);
+static TreeReturnCode MakeDotNode    (Node_t* node, FILE* file, int* node_number);
+
+static TreeReturnCode AskQuestion    (Node_t* node);
+static TreeReturnCode JoinQuestion   (Node_t* node);
+
+static int PrintQuestion(const char* str, ...);
 
 //------------------------------------------------//
 
-TreeReturnCode NodeCtor(Node_t** ret_node_ptr)
+Node_t* NodeCtor()
 {
-    DO_IF(!ret_node_ptr, return TREE_NULL_ARG_PTR_ERROR);
-
-    *ret_node_ptr = (Node*) calloc(1, sizeof(Node));
-
-    return TREE_SUCCESS;
+    return (Node*) calloc(1, sizeof(Node));
 }
 
 //------------------------------------------------//
 
-TreeReturnCode JoinTopNode(Node_t* node, Node_t* left, Node_t* right)
+int PrintQuestion(const char* str, ...)
 {
-    DO_IF(!node, return TREE_NULL_ARG_PTR_ERROR);
+	va_list list;
+    va_start(list, str);
 
-    node->left  = left;
-    node->right = right;
+    vprintf(str, list);
+    int ans = getchar();
+    getchar();
 
-    return TREE_SUCCESS;
+    return ans;
 }
 
 //------------------------------------------------//
 
-TreeReturnCode JoinLowNode(Node_t* node, Node_t* parent)
+TreeReturnCode AskQuestion(Node_t* node)
 {
-    DO_IF(!node || !parent, return TREE_NULL_ARG_PTR_ERROR);
+    DO_IF(!node || !node->data.str, return TREE_NULL_ARG_PTR_ERROR);
 
-    if (node->data)
+    int ans = PrintQuestion("%s?\n", node->data.str);
 
-    return TREE_SUCCESS;
-}
-
-//------------------------------------------------//
-
-TreeReturnCode JoinNodeByValue(Node_t* parent, NodeData_t value)
-{
-    DO_IF(!parent, return TREE_NULL_ARG_PTR_ERROR);
-
-    if (value <= parent->data)
+    if (node->data.is_question)
     {
-        next_node = parent->left;
+        (ans == 'y') ? AskQuestion(node->left) : AskQuestion(node->right);
     }
     else
     {
-        next_node = cur_node->right;
+        if (ans != 'y') JoinQuestion(node);
     }
-
-    if (next_node)
-    {
-        cur_node = next_node;
-        continue;
-    }
-
-    NodeCtor(&next_node);
-    cur_node->
-    cur_node->left->data = value;
-}
-
-//------------------------------------------------//
-
-TreeReturnCode TreeCtor(Tree_t** ret_tree_ptr, size_t n_nodes)
-{
-    DO_IF(!ret_tree_ptr, return TREE_NULL_ARG_PTR_ERROR);
-
-    if (n_nodes < MinNumOfNodes)
-    {
-        n_nodes = MinNumOfNodes;
-    }
-
-    Tree_t* tree     = (Tree_t*) calloc(sizeof(ret_tree_ptr) + tree->size * sizeof(Node_t), sizeof(char));
-    tree->size       = n_nodes;
-    tree->memory     = (Node_t*) tree + 1;
-    tree->free_place = 0;
 
     return TREE_SUCCESS;
 }
 
 //------------------------------------------------//
 
-TreeReturnCode PrintTextTree (Node_t* node)
+TreeReturnCode JoinQuestion(Node_t* node)
 {
     DO_IF(!node, return TREE_NULL_ARG_PTR_ERROR);
 
-    putchar('(');
-    if (node->left) PrintTextTree(node->left);
-    printf("%d", node->data);
-    if (node->right) PrintTextTree(node->right);
-    putchar(')');
+    printf("What is it then?\n");
+    char ans[NodeDataStrSize]  = {};
+    scanf("%[^\n]", ans);
+    getchar();
+
+    printf("What is the difference between %s and %s?\n", ans, node->data.str);
+    char diff[NodeDataStrSize] = {};
+    scanf("%[^\n]", diff);
+    getchar();
+
+    Node_t* left_node      = NodeCtor(); // check for nullptr
+    left_node->data.str    = strdup(ans);
+    node->left             = left_node;
+
+    Node_t* right_node     = NodeCtor(); // check for nullptr
+    right_node->data.str   = node->data.str;
+    node->right            = right_node;
+
+    node->data.str         = strdup(diff);
+    node->data.is_question = true;
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------//
+
+TreeReturnCode StartGame(Node_t* node)
+{
+    AskQuestion(node);
+
+    PrintGraphTree(node, 1);
+
+    int ans  = PrintQuestion("Game is over. Do you want to play again?\n");
+
+    if (ans == 'y') StartGame(node);
 
     return TREE_SUCCESS;
 }
@@ -105,8 +104,9 @@ TreeReturnCode PrintGraphTree(Node_t* node, int file_number)
 {
     DO_IF(!node, return TREE_NULL_ARG_PTR_ERROR);
 
-    char dot_file_name[BufSize] = {};
-    snprintf(dot_file_name, BufSize, "logs/dot_files/%03d.dot", file_number);
+    char dot_file_name[FileNameBufSize] = {};
+    snprintf(dot_file_name, FileNameBufSize, "logs/dot_files/%03d.dot", file_number);
+
     FILE* dot_file = fopen(dot_file_name, "w");
 
     fputs("digraph G{\n"
@@ -123,11 +123,12 @@ TreeReturnCode PrintGraphTree(Node_t* node, int file_number)
 
     fclose(dot_file);
 
-    char png_file_name[BufSize] = {};
-    snprintf(png_file_name, BufSize, "logs/images/%03d.png", file_number);
+    char png_file_name[FileNameBufSize] = {};
+    snprintf(png_file_name, FileNameBufSize, "logs/images/%03d.png", file_number);
 
-    char command[4*BufSize] = {};
-    snprintf(command, 4*BufSize, "touch %s; dot %s -Tpng -o %s", png_file_name, dot_file_name, png_file_name);
+    char command[SysCommandBufSize] = {};
+    snprintf(command, SysCommandBufSize, "touch %s; dot %s -Tpng -o %s",
+             png_file_name, dot_file_name, png_file_name);
 
     system(command);
 
@@ -142,9 +143,10 @@ TreeReturnCode MakeDotNode(Node_t* node, FILE* file, int* node_number)
 
     fprintf(file, "elem%d["
                   "shape=\"Mrecord\", "
-                  "label=\"{ %d | data = %d | left = %p | right = %p }"
+                  "label=\"{ %d | data.is_question = %s | data.str = %s | left = %p | right = %p }"
                   "\"];\n",
-                  *node_number, *node_number , node->data, node->left, node->right);
+                  *node_number, *node_number , node->data.is_question ? "true" : "false",
+                   node->data.str, node->left, node->right);
 
     int head_node_number = *node_number;
 
@@ -152,7 +154,7 @@ TreeReturnCode MakeDotNode(Node_t* node, FILE* file, int* node_number)
     {
         int left_node_number = ++*node_number;
 
-        fprintf(file, "elem%d->elem%d;", head_node_number, left_node_number);
+        fprintf(file, "elem%d->elem%d[label = \"yes\"];", head_node_number, left_node_number);
 
         MakeDotNode(node->left, file, node_number);
     }
@@ -161,7 +163,7 @@ TreeReturnCode MakeDotNode(Node_t* node, FILE* file, int* node_number)
     {
         int right_node_number = ++*node_number;
 
-        fprintf(file, "elem%d->elem%d;", head_node_number, right_node_number);
+        fprintf(file, "elem%d->elem%d[label = \"no\"];", head_node_number, right_node_number);
 
         MakeDotNode(node->right, file, node_number);
     }
