@@ -58,15 +58,11 @@ DataBaseStatus DataBaseStringsCtor(DataBase_t* db)
     db->strings = (char**) calloc(db->n_strings, sizeof(char*));
     VERIFY(!db->data, return DB_ALLOCATE_ERROR);
 
-    cursor = db->data;
-    for (int i = 0; i < db->n_strings; i++)
+    db->strings[0] = strtok(db->data, "\n\t");
+
+    for (int i = 1; i < db->n_strings; i++)
     {
-        db->strings[i] = cursor;
-        cursor = strchr(cursor, '\n') + 1;
-        while (isspace(*cursor))
-        {
-            cursor++;
-        }
+        db->strings[i] = strtok(nullptr, "\n\t");
     }
 
     return DB_SUCCESS;

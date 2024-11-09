@@ -84,6 +84,8 @@ AkinatorStatus RunAkinator()
 
 AkinatorStatus RunGuessing(Node_t* node)
 {
+    ASSERT(node);
+
     VERIFY(RecursivelyAskQuestion(node), return AKINATOR_ASK_QUESTION_ERROR);
 
     int ans = GetShortAnsColored(YellowColor, "\nGame is over. Do you want to play again?\n");
