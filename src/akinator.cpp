@@ -5,19 +5,14 @@
 #include <data_base.h>
 
 #include "akinator.h"
-
-//------------------------------------------------//
-
-static AkinatorStatus MakeDotNode   (Node_t* node, FILE* file, int* node_number);
-
-//------------------------------------------------//
+#include "tree_dump.h"
 
 static AkinatorStatus RunGuessing   (Node_t* node);
 static AkinatorStatus AskQuestion   (Node_t* node);
 static AkinatorStatus JoinQuestion  (Node_t* node);
 static int            PrintQuestion (const char* str, ...);
 
-//------------------------------------------------//
+//================================================//
 
 AkinatorStatus RunAkinator()
 {
@@ -25,16 +20,16 @@ AkinatorStatus RunAkinator()
 
     DataBase_t db = {};
 
-    ReadDB(&db, root);
+    VERIFY(ReadDB(&db, root),   return AKINATOR_READ_DB_ERROR);
 
     RunGuessing(root); //TODO different modes
 
-    UpdateDB(&db, root);
+    VERIFY(UpdateDB(&db, root), return AKINATOR_UPDATE_DB_ERROR);
 
     return AKINATOR_SUCCESS;
 }
 
-//------------------------------------------------//
+//================================================//
 
 AkinatorStatus RunGuessing(Node_t* node)
 {
@@ -49,14 +44,14 @@ AkinatorStatus RunGuessing(Node_t* node)
     return AKINATOR_SUCCESS;
 }
 
-//------------------------------------------------//
+//================================================//
 
 Node_t* NodeCtor()
 {
     return (Node*) calloc(1, sizeof(Node));
 }
 
-//------------------------------------------------//
+//================================================//
 
 int PrintQuestion(const char* str, ...)
 {
@@ -70,11 +65,13 @@ int PrintQuestion(const char* str, ...)
     return ans;
 }
 
-//------------------------------------------------//
+//================================================//
 
 AkinatorStatus AskQuestion(Node_t* node)
 {
-    VERIFY(!node || !node->data.str, return AKINATOR_NULL_ARG_PTR_ERROR);
+    ASSERT(node);
+
+    VERIFY(!node->data.str, return AKINATOR_NULL_ARG_PTR_ERROR);
 
     int ans = PrintQuestion("%s?\n", node->data.str);
 
@@ -90,7 +87,7 @@ AkinatorStatus AskQuestion(Node_t* node)
     return AKINATOR_SUCCESS;
 }
 
-//------------------------------------------------//
+//================================================//
 
 AkinatorStatus JoinQuestion(Node_t* node)
 {
@@ -106,12 +103,16 @@ AkinatorStatus JoinQuestion(Node_t* node)
     scanf("%[^\n]", diff);
     getchar();
 
-    Node_t* left_node      = NodeCtor(); // check for nullptr
+    Node_t* left_node      = NodeCtor();
+    VERIFY(!left_node, return AKINATOR_NODE_CTOR_ERROR);
+
     left_node->data.str    = strdup(ans);
     node->left             = left_node;
     node->left->level      = node->level + 1;
 
-    Node_t* right_node     = NodeCtor(); // check for nullptr
+    Node_t* right_node     = NodeCtor();
+    VERIFY(!right_node, return AKINATOR_NODE_CTOR_ERROR);
+
     right_node->data.str   = node->data.str;
     node->right            = right_node;
     node->right->level     = node->level + 1;
@@ -122,77 +123,4 @@ AkinatorStatus JoinQuestion(Node_t* node)
     return AKINATOR_SUCCESS;
 }
 
-//------------------------------------------------//
-
-AkinatorStatus Dump(Node_t* node, int file_number)
-{
-    VERIFY(!node, return AKINATOR_NULL_ARG_PTR_ERROR);
-
-    char dot_file_name[FileNameBufSize] = {};
-    snprintf(dot_file_name, FileNameBufSize, "logs/dot_files/%03d.dot", file_number);
-
-    FILE* dot_file = fopen(dot_file_name, "w");
-
-    fputs("digraph G{\n"
-          "rankdir=HR;\n"
-          "node[color=\"red\",fontsize=14];\n"
-          "edge[color=\"#00eeee80\",fontsize=12, penwidth=1];\n",
-          dot_file);
-
-    int node_number = 1;
-
-    MakeDotNode(node, dot_file, &node_number);
-
-    fputs("}\n", dot_file);
-
-    fclose(dot_file);
-
-    char png_file_name[FileNameBufSize] = {};
-    snprintf(png_file_name, FileNameBufSize, "logs/images/%03d.png", file_number);
-
-    char command[SysCommandBufSize] = {};
-    snprintf(command, SysCommandBufSize, "touch %s; dot %s -Tpng -o %s",
-             png_file_name, dot_file_name, png_file_name);
-
-    system(command);
-
-    return AKINATOR_SUCCESS;
-}
-
-//------------------------------------------------//
-
-AkinatorStatus MakeDotNode(Node_t* node, FILE* file, int* node_number)
-{
-    VERIFY(!node, return AKINATOR_NULL_ARG_PTR_ERROR);
-
-    fprintf(file, "elem%d["
-                  "shape=\"Mrecord\", "
-                  "label=\"{ %d | data.is_question = %s | data.str = %s | left = %p | right = %p }"
-                  "\"];\n",
-                  *node_number, *node_number , node->data.is_question ? "true" : "false",
-                   node->data.str, node->left, node->right);
-
-    int head_node_number = *node_number;
-
-    if (node->left)
-    {
-        int left_node_number = ++*node_number;
-
-        fprintf(file, "elem%d->elem%d[label = \"yes\"];", head_node_number, left_node_number);
-
-        MakeDotNode(node->left, file, node_number);
-    }
-
-    if (node->right)
-    {
-        int right_node_number = ++*node_number;
-
-        fprintf(file, "elem%d->elem%d[label = \"no\"];", head_node_number, right_node_number);
-
-        MakeDotNode(node->right, file, node_number);
-    }
-
-    return AKINATOR_SUCCESS;
-}
-
-//------------------------------------------------//
+//================================================//

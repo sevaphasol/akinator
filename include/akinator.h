@@ -2,24 +2,33 @@
 #define AKINATOR_H__
 
 #include <stdio.h>
+#include <stdlib.h>
 
 //------------------------------------------------//
 
 /* Provided for reducing code size of checks in functions */
-#define VERIFY(condition, action)                      \
-if (condition)                                         \
-{                                                      \
-    fprintf(stderr, "%s in %s:%d:%s\n",                \
-    #action, __FILE__, __LINE__, __PRETTY_FUNCTION__); \
-    action;                                            \
-}                                                      \
+#define VERIFY(condition, action)                                         \
+if (condition)                                                            \
+{                                                                         \
+    fprintf(stderr, "%s in %s:%d:%s\n",                                   \
+                    #action, __FILE__, __LINE__, __PRETTY_FUNCTION__);    \
+    action;                                                               \
+}                                                                         \
+
+/* Acts like an usual assert, but does exit(EXIT_FAILURE) instead of abort()
+   Provided for saving info in currently writing files when programm stops. */
+#define ASSERT(condition)                                                 \
+if (!condition)                                                           \
+{                                                                         \
+    fprintf(stderr, "%s:%d: %s: Assertion `%s' failed.\n",                \
+                    __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition); \
+    exit(EXIT_FAILURE);                                                   \
+}                                                                         \
 
 //------------------------------------------------//
 
 const size_t MinNumOfNodes     = 256;
 
-const size_t FileNameBufSize   = 64;
-const size_t SysCommandBufSize = 278;
 const size_t NodeDataStrSize   = 128;
 
 //------------------------------------------------//
@@ -29,6 +38,8 @@ enum AkinatorStatus
     AKINATOR_SUCCESS = 0,
     AKINATOR_NULL_ARG_PTR_ERROR,
     AKINATOR_READ_DB_ERROR,
+    AKINATOR_UPDATE_DB_ERROR,
+    AKINATOR_NODE_CTOR_ERROR,
 };
 
 //------------------------------------------------//
@@ -54,7 +65,6 @@ AkinatorStatus RunAkinator();
 //------------------------------------------------//
 
 Node_t*        NodeCtor  ();
-AkinatorStatus Dump      (Node_t*  node, int file_number);
 
 //------------------------------------------------//
 

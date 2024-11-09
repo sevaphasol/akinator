@@ -1,18 +1,21 @@
 digraph G{
 rankdir=HR;
-node[color="red",fontsize=14];
-edge[color="#00eeee80",fontsize=12, penwidth=1];
-elem1[shape="Mrecord", label="{ 1 | data.is_question = true | data.str = Животное | left = 0x65240b8816d0 | right = 0x65240b8818b0 }"];
-elem1->elem2[label = "yes"];elem2[shape="Mrecord", label="{ 2 | data.is_question = true | data.str = Кошка | left = 0x65240b881770 | right = 0x65240b881810 }"];
-elem2->elem3[label = "yes"];elem3[shape="Mrecord", label="{ 3 | data.is_question = false | data.str = Полторашка | left = (nil) | right = (nil) }"];
-elem2->elem4[label = "no"];elem4[shape="Mrecord", label="{ 4 | data.is_question = false | data.str = Хз кто | left = (nil) | right = (nil) }"];
-elem1->elem5[label = "no"];elem5[shape="Mrecord", label="{ 5 | data.is_question = true | data.str = Ведёт матан | left = 0x65240b881950 | right = 0x65240b8819f0 }"];
-elem5->elem6[label = "yes"];elem6[shape="Mrecord", label="{ 6 | data.is_question = false | data.str = Калиниченко | left = (nil) | right = (nil) }"];
-elem5->elem7[label = "no"];elem7[shape="Mrecord", label="{ 7 | data.is_question = true | data.str = Ведёт физос | left = 0x65240b881a90 | right = 0x65240b881b30 }"];
-elem7->elem8[label = "yes"];elem8[shape="Mrecord", label="{ 8 | data.is_question = false | data.str = Чивилёв | left = (nil) | right = (nil) }"];
-elem7->elem9[label = "no"];elem9[shape="Mrecord", label="{ 9 | data.is_question = true | data.str = Ведёт прогу | left = 0x65240b881bd0 | right = 0x65240b881db0 }"];
-elem9->elem10[label = "yes"];elem10[shape="Mrecord", label="{ 10 | data.is_question = true | data.str = Ведёт прогу на РТ и СП | left = 0x65240b881c70 | right = 0x65240b881d10 }"];
-elem10->elem11[label = "yes"];elem11[shape="Mrecord", label="{ 11 | data.is_question = false | data.str = Дед | left = (nil) | right = (nil) }"];
-elem10->elem12[label = "no"];elem12[shape="Mrecord", label="{ 12 | data.is_question = false | data.str = Хз кто | left = (nil) | right = (nil) }"];
-elem9->elem13[label = "no"];elem13[shape="Mrecord", label="{ 13 | data.is_question = false | data.str = Киреев | left = (nil) | right = (nil) }"];
+node[style=filled, color="#756bb1", fillcolor="#a1d99b",fontcolor="#ba3d3d", fontsize=14];
+edge[color="#006d2c", fontsize=12, penwidth=1, fontcolor = "#49006a"];
+bgcolor="#bcbddc";
+elem1[shape="Mrecord", label="{ 1 | data.is_question = true | data.str = Животное | left = 0x56aca08fe720 | right = 0x56aca08fea40 }"];
+elem1->elem2[label = " да "];elem2[shape="Mrecord", label="{ 2 | data.is_question = true | data.str = Препод | left = 0x56aca08fe7c0 | right = 0x56aca08fe9a0 }"];
+elem2->elem3[label = " да "];elem3[shape="Mrecord", label="{ 3 | data.is_question = true | data.str = Квадробер | left = 0x56aca08fe860 | right = 0x56aca08fe900 }"];
+elem3->elem4[label = " да "];elem4[shape="Mrecord", label="{ 4 | data.is_question = false | data.str = Дед | left = (nil) | right = (nil) }"];
+elem3->elem5[label = " нет "];elem5[shape="Mrecord", label="{ 5 | data.is_question = false | data.str = Какой-то факер | left = (nil) | right = (nil) }"];
+elem2->elem6[label = " нет "];elem6[shape="Mrecord", label="{ 6 | data.is_question = false | data.str = Полторашка | left = (nil) | right = (nil) }"];
+elem1->elem7[label = " нет "];elem7[shape="Mrecord", label="{ 7 | data.is_question = true | data.str = Ведёт матан | left = 0x56aca08feae0 | right = 0x56aca08feb80 }"];
+elem7->elem8[label = " да "];elem8[shape="Mrecord", label="{ 8 | data.is_question = false | data.str = Калиниченко | left = (nil) | right = (nil) }"];
+elem7->elem9[label = " нет "];elem9[shape="Mrecord", label="{ 9 | data.is_question = true | data.str = Ведёт физос | left = 0x56aca08fec20 | right = 0x56aca08fecc0 }"];
+elem9->elem10[label = " да "];elem10[shape="Mrecord", label="{ 10 | data.is_question = false | data.str = Чивилёв | left = (nil) | right = (nil) }"];
+elem9->elem11[label = " нет "];elem11[shape="Mrecord", label="{ 11 | data.is_question = true | data.str = Ведёт прогу | left = 0x56aca08fed60 | right = 0x56aca08fef40 }"];
+elem11->elem12[label = " да "];elem12[shape="Mrecord", label="{ 12 | data.is_question = true | data.str = Ведёт прогу на РТ и СП | left = 0x56aca08fee00 | right = 0x56aca08feea0 }"];
+elem12->elem13[label = " да "];elem13[shape="Mrecord", label="{ 13 | data.is_question = false | data.str = Дед | left = (nil) | right = (nil) }"];
+elem12->elem14[label = " нет "];elem14[shape="Mrecord", label="{ 14 | data.is_question = false | data.str = Хз кто | left = (nil) | right = (nil) }"];
+elem11->elem15[label = " нет "];elem15[shape="Mrecord", label="{ 15 | data.is_question = false | data.str = Киреев | left = (nil) | right = (nil) }"];
 }
