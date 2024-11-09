@@ -1,7 +1,11 @@
 #ifndef COLORS_H__
 #define COLORS_H__
 
+//------------------------------------------------//
+
 #include <stdlib.h>
+
+//------------------------------------------------//
 
 const char* const WhiteColor     = "\033[0m";
 const char* const RedColor       = "\033[31m";

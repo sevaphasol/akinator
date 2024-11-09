@@ -1,10 +1,14 @@
 #ifndef DATA_BASE_H__
 #define DATA_BASE_H__
 
+//------------------------------------------------//
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "akinator.h"
+
+//------------------------------------------------//
 
 /* Provided for reducing code size of checks in functions */
 #define VERIFY(condition, action)                                         \
@@ -25,6 +29,11 @@ if (!condition)                                                           \
     exit(EXIT_FAILURE);                                                   \
 }                                                                         \
 
+//------------------------------------------------//
+
+const char* const Delim = "\n\t";
+
+//------------------------------------------------//
 typedef enum DataBaseStatus
 {
     DB_SUCCESS = 0,
@@ -45,6 +54,8 @@ typedef enum DataBaseStatus
     DB_DATA_ALLOCATE_ERROR,
 } DataBaseStatus;
 
+//------------------------------------------------//
+
 typedef struct DataBase
 {
     FILE*       origin_file;
@@ -55,7 +66,11 @@ typedef struct DataBase
     char**      strings;
 } DataBase_t;
 
+//------------------------------------------------//
+
 DataBaseStatus ReadDB   (DataBase_t* db, Node_t* root, const char* file_name);
 DataBaseStatus UpdateDB (DataBase_t* db, Node_t* root, const char* file_name);
+
+//------------------------------------------------//
 
 #endif // DATA_BASE_H__

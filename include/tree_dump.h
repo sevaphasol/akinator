@@ -1,10 +1,14 @@
 #ifndef TREE_DUMP_H__
 #define TREE_DUMP_H__
 
+//------------------------------------------------//
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "akinator.h"
+
+//------------------------------------------------//
 
 /* Provided for reducing code size of checks in functions */
 #define VERIFY(condition, action)                                         \

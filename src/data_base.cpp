@@ -12,6 +12,7 @@
 static DataBaseStatus ScanDB                  (DataBase_t* db, const char* file_name);
 static DataBaseStatus GetFileSize             (FILE* file_ptr, size_t* size);
 static DataBaseStatus DataBaseStringsCtor     (DataBase_t* db);
+static size_t         CountNumberOfStrings    (char* text);
 
 //------------------------------------------------//
 
@@ -48,24 +49,37 @@ DataBaseStatus DataBaseStringsCtor(DataBase_t* db)
 {
     ASSERT(db);
 
-    char* cursor = db->data;
-    while (cursor = strchr(cursor, '\n'))
-    {
-        db->n_strings++;
-        cursor++;
-    }
+    db->n_strings = CountNumberOfStrings(db->data);
 
     db->strings = (char**) calloc(db->n_strings, sizeof(char*));
     VERIFY(!db->data, return DB_ALLOCATE_ERROR);
 
-    db->strings[0] = strtok(db->data, "\n\t");
+    db->strings[0] = strtok(db->data, Delim);
 
     for (int i = 1; i < db->n_strings; i++)
     {
-        db->strings[i] = strtok(nullptr, "\n\t");
+        db->strings[i] = strtok(nullptr, Delim);
     }
 
     return DB_SUCCESS;
+}
+
+//------------------------------------------------//
+
+size_t CountNumberOfStrings(char* text)
+{
+    ASSERT(text);
+
+    int n_strings = 0;
+
+    char* cursor = text;
+    while (cursor = strchr(cursor, '\n'))
+    {
+        n_strings++;
+        cursor++;
+    }
+
+    return n_strings;
 }
 
 //================================================//
