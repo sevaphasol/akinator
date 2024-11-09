@@ -1,13 +1,7 @@
-#ifndef DATA_BASE_H__
-#define DATA_BASE_H__
-
-//------------------------------------------------//
-
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef NODE_ALLOCATOR_H__
+#define NODE_ALLOCATOR_H__
 
 #include "akinator.h"
-#include "node_allocator.h"
 
 //------------------------------------------------//
 
@@ -32,47 +26,51 @@ if (!condition)                                                           \
 
 //------------------------------------------------//
 
-const char* const Delim = "\n\t";
-
-//------------------------------------------------//
-enum DataBaseStatus
+enum NodeAllocatorStatus
 {
-    DB_SUCCESS = 0,
-    DB_FAILURE,
-    DB_RECURSION_ERROR,
-    DB_FILE_READ_ERROR,
-    DB_SCAN_FILE_ERROR,
-    DB_STRINGS_CTOR_ERROR,
-    DB_INPUT_FILE_FORMAT_ERROR,
-    DB_READ_STRING_ERROR,
-    DB_UPDATE_STRING_ERROR,
-    DB_STRUCT_NULL_PTR_ERROR,
-    DB_READ_FILE_ERROR,
-    DB_NULL_PTR_ARG_ERROR,
-    DB_GET_FILE_SIZE_ERROR,
-    DB_ALLOCATE_ERROR,
-    DB_FILE_OPEN_ERROR,
-    DB_DATA_ALLOCATE_ERROR,
+    NODE_ALLOCATOR_SUCCESS = 0,
+    NODE_ALLOCATOR_STRUCT_NULL_PTR_ERROR,
+    NODE_ALLOCATORE_STD_CALLOC_ERROR,
+    NODE_ALLOCATOR_INVALID_NEW_NODE_ERROR,
+    NODE_ALLOCATOR_BIG_ARRAY_REALLOC_ERROR,
+    NODE_ALLOCATOR_ARRAYS_CALLOC_ERROR,
 };
 
 //------------------------------------------------//
 
-typedef struct DataBase
+typedef struct NodeData
 {
-    FILE*       origin_file;
-    FILE*       updated_file;
-    size_t      size;
-    char*       data;
-    size_t      n_strings;
-    char**      strings;
-} DataBase_t;
+    bool  is_question;
+    char* str;
+} NodeData_t;
+
+typedef struct Node
+{
+    int        level;
+    NodeData_t data;
+    Node*      left;
+    Node*      right;
+} Node_t;
+
+typedef struct Allocator
+{
+    size_t   n_arrays;
+    size_t   n_nodes_in_array;
+    Node_t** big_array;
+    Node_t*  answers;
+    int      free_place;
+} Allocator_t;
 
 //------------------------------------------------//
 
-DataBaseStatus ReadDB   (DataBase_t* db, Allocator_t* allocator,
-                         Node_t* root, const char* file_name);
-DataBaseStatus UpdateDB (DataBase_t* db, Node_t* root, const char* file_name);
+NodeAllocatorStatus AllocatorCtor (Allocator_t* allocator,
+                                   size_t n_arrays,
+                                   size_t n_nodes_in_array);
+
+NodeAllocatorStatus AllocatorDtor(Allocator_t* allocator);
+
+NodeAllocatorStatus NodeCtor      (Allocator_t* allocator, Node_t** node);
 
 //------------------------------------------------//
 
-#endif // DATA_BASE_H__
+#endif // NODE_ALLOCATOR_H__

@@ -7,27 +7,32 @@
 #include "data_base.h"
 #include "colors.h"
 #include "tree_dump.h"
+#include "node_allocator.h"
 
-static AkinatorStatus RunGuessing            (Node_t* node);
-static AkinatorStatus RecursivelyAskQuestion (Node_t* node);
-static AkinatorStatus JoinNewQuestion        (Node_t* node);
+//------------------------------------------------//
+
+static AkinatorStatus RunGuessing            (Allocator_t* allocator, Node_t* node);
+static AkinatorStatus RecursivelyAskQuestion (Allocator_t* allocator, Node_t* node);
+static AkinatorStatus JoinNewQuestion        (Allocator_t* allocator, Node_t* node);
+
+//------------------------------------------------//
+
+static AkinatorStatus RunCharacteristic      (Node_t* root);
+
+//------------------------------------------------//
+
+static AkinatorStatus RunDifference          (Node_t* root);
 
 //================================================//
 
-Node_t* NodeCtor()
+AkinatorStatus RunAkinator(Allocator_t* allocator)
 {
-    return (Node*) calloc(1, sizeof(Node));
-}
-
-//================================================//
-
-AkinatorStatus RunAkinator()
-{
-    Node_t*  root = NodeCtor();
+    Node_t* root = nullptr;
+    NodeCtor(allocator, &root);
 
     DataBase_t db = {};
 
-    VERIFY(ReadDB(&db, root, DataBase), return AKINATOR_READ_DB_ERROR);
+    VERIFY(ReadDB(&db, allocator, root, DataBase), return AKINATOR_READ_DB_ERROR);
 
     Dump(root, DumpOriginDataBase);
 
@@ -47,15 +52,15 @@ AkinatorStatus RunAkinator()
         switch (ans)
         {
             case 'g':
-                VERIFY(RunGuessing(root), return AKINATOR_GUESSING_ERROR);
+                VERIFY(RunGuessing(allocator, root), return AKINATOR_GUESSING_ERROR);
                 break;
 
             case 'c':
-                ColorPrintf(BlueColor, "\nDeveloping...\n");
+                VERIFY(RunCharacteristic(root),      return AKINATOR_GUESSING_ERROR);
                 break;
 
             case 'd':
-                ColorPrintf(BlueColor, "\nDeveloping...\n");
+                VERIFY(RunDifference(root),          return AKINATOR_GUESSING_ERROR);
                 break;
 
             case 'q':
@@ -82,22 +87,22 @@ AkinatorStatus RunAkinator()
 
 //================================================//
 
-AkinatorStatus RunGuessing(Node_t* node)
+AkinatorStatus RunGuessing(Allocator_t* allocator, Node_t* node)
 {
     ASSERT(node);
 
-    VERIFY(RecursivelyAskQuestion(node), return AKINATOR_ASK_QUESTION_ERROR);
+    VERIFY(RecursivelyAskQuestion(allocator, node), return AKINATOR_ASK_QUESTION_ERROR);
 
     int ans = GetShortAnsColored(YellowColor, "\nGame is over. Do you want to play again?\n");
 
-    if (ans == 'y') RunGuessing(node);
+    if (ans == 'y') RunGuessing(allocator, node);
 
     return AKINATOR_SUCCESS;
 }
 
 //================================================//
 
-AkinatorStatus RecursivelyAskQuestion(Node_t* node)
+AkinatorStatus RecursivelyAskQuestion(Allocator_t* allocator, Node_t* node)
 {
     ASSERT(node);
 
@@ -107,11 +112,11 @@ AkinatorStatus RecursivelyAskQuestion(Node_t* node)
 
     if (node->data.is_question)
     {
-        (ans == 'y') ? RecursivelyAskQuestion(node->left) : RecursivelyAskQuestion(node->right);
+        (ans == 'y') ? RecursivelyAskQuestion(allocator, node->left) : RecursivelyAskQuestion(allocator, node->right);
     }
     else
     {
-        if (ans != 'y') JoinNewQuestion(node);
+        if (ans != 'y') JoinNewQuestion(allocator, node);
     }
 
     return AKINATOR_SUCCESS;
@@ -119,7 +124,7 @@ AkinatorStatus RecursivelyAskQuestion(Node_t* node)
 
 //================================================//
 
-AkinatorStatus JoinNewQuestion(Node_t* node)
+AkinatorStatus JoinNewQuestion(Allocator_t* allocator, Node_t* node)
 {
     VERIFY(!node, return AKINATOR_NULL_ARG_PTR_ERROR);
 
@@ -130,15 +135,17 @@ AkinatorStatus JoinNewQuestion(Node_t* node)
                                    "\nWhat is the difference between %s and %s?\n",
                                    ans, node->data.str);
 
-    Node_t* left_node      = NodeCtor();
+    Node_t* left_node      = nullptr;
+    NodeCtor(allocator, &left_node);
     VERIFY(!left_node, return AKINATOR_NODE_CTOR_ERROR);
 
     left_node->data.str    = ans;
     node->left             = left_node;
     node->left->level      = node->level + 1;
 
-    Node_t* right_node     = NodeCtor();
-    VERIFY(!right_node, return AKINATOR_NODE_CTOR_ERROR);
+    Node_t* right_node      = nullptr;
+    NodeCtor(allocator, &right_node);
+    VERIFY(!left_node, return AKINATOR_NODE_CTOR_ERROR);
 
     right_node->data.str   = node->data.str;
     node->right            = right_node;
@@ -146,6 +153,28 @@ AkinatorStatus JoinNewQuestion(Node_t* node)
 
     node->data.str         = diff;
     node->data.is_question = true;
+
+    return AKINATOR_SUCCESS;
+}
+
+//================================================//
+
+AkinatorStatus RunCharacteristic(Node_t* root)
+{
+    char* hero = GetLongAnsColored(PurpleColor,
+                                   "\nWhose characteristic do you want me to tell?\n");
+
+    return AKINATOR_SUCCESS;
+}
+
+//================================================//
+
+AkinatorStatus RunDifference(Node_t* root)
+{
+    char* hero1 = GetLongAnsColored(PurpleColor,
+                                    "\nWhich heroes difference do you want me to tell?\n");
+
+    char* hero2 = GetLongAnsColored(PurpleColor, "");
 
     return AKINATOR_SUCCESS;
 }

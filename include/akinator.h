@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "node_allocator.h"
+
 //------------------------------------------------//
 
 /* Provided for reducing code size of checks in functions */
@@ -27,13 +29,13 @@ if (!condition)                                                           \
 
 //------------------------------------------------//
 
-const char* const DumpOriginDataBase  = "DataBase";
-const char* const DumpUpdatedDataBase = "UpdatedDataBase";
+const char* const DumpOriginDataBase    = "DataBase";
+const char* const DumpUpdatedDataBase   = "UpdatedDataBase";
 
-const char* const DataBase            = "DataBase.txt";
+const char* const DataBase              = "DataBase.txt";
 
-const size_t MinNumOfNodes       = 256;
-const size_t NodeDataStrSize     = 128;
+const size_t NumOfNodesInAllocatedArray = 1024;
+const size_t NumOfAllocatedArrays       = 1;
 
 //------------------------------------------------//
 
@@ -50,27 +52,7 @@ enum AkinatorStatus
 
 //------------------------------------------------//
 
-typedef struct NodeData
-{
-    bool  is_question;
-    char* str;
-} NodeData_t;
-
-typedef struct Node
-{
-    int        level;
-    NodeData_t data;
-    Node*      left;
-    Node*      right;
-} Node_t;
-
-//------------------------------------------------//
-
-AkinatorStatus RunAkinator();
-
-//------------------------------------------------//
-
-Node_t* NodeCtor();
+AkinatorStatus RunAkinator(Allocator_t* allocator);
 
 //------------------------------------------------//
 
