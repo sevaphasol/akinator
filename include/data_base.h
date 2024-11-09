@@ -25,8 +25,6 @@ if (!condition)                                                           \
     exit(EXIT_FAILURE);                                                   \
 }                                                                         \
 
-const char* const DataBaseName = "DataBase.txt";
-
 typedef enum DataBaseStatus
 {
     DB_SUCCESS = 0,
@@ -49,14 +47,15 @@ typedef enum DataBaseStatus
 
 typedef struct DataBase
 {
-    FILE*       file;
+    FILE*       origin_file;
+    FILE*       updated_file;
     size_t      size;
     char*       data;
     size_t      n_strings;
     char**      strings;
 } DataBase_t;
 
-DataBaseStatus ReadDB   (DataBase_t* db, Node_t* root);
-DataBaseStatus UpdateDB (DataBase_t* db, Node_t* root);
+DataBaseStatus ReadDB   (DataBase_t* db, Node_t* root, const char* file_name);
+DataBaseStatus UpdateDB (DataBase_t* db, Node_t* root, const char* file_name);
 
 #endif // DATA_BASE_H__

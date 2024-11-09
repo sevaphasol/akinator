@@ -1,0 +1,21 @@
+digraph G{
+rankdir=HR;
+node[style=filled, color="#756bb1", fillcolor="#a1d99b",fontcolor="#ba3d3d", fontsize=14];
+edge[color="#006d2c", fontsize=12, penwidth=1, fontcolor = "#49006a"];
+bgcolor="#bcbddc";
+elem1[shape="Mrecord", label="Животное?"];
+elem1->elem2[label = " да "];elem2[shape="Mrecord", label="Препод?"];
+elem2->elem3[label = " да "];elem3[shape="Mrecord", label="Квадробер?"];
+elem3->elem4[label = " да "];elem4[shape="Mrecord", label="Дед"];
+elem3->elem5[label = " нет "];elem5[shape="Mrecord", label="Какой-то факер"];
+elem2->elem6[label = " нет "];elem6[shape="Mrecord", label="Полторашка"];
+elem1->elem7[label = " нет "];elem7[shape="Mrecord", label="Ведёт матан?"];
+elem7->elem8[label = " да "];elem8[shape="Mrecord", label="Калиниченко"];
+elem7->elem9[label = " нет "];elem9[shape="Mrecord", label="Ведёт физос?"];
+elem9->elem10[label = " да "];elem10[shape="Mrecord", label="Чивилёв"];
+elem9->elem11[label = " нет "];elem11[shape="Mrecord", label="Ведёт прогу?"];
+elem11->elem12[label = " да "];elem12[shape="Mrecord", label="Ведёт прогу на РТ и СП?"];
+elem12->elem13[label = " да "];elem13[shape="Mrecord", label="Дед"];
+elem12->elem14[label = " нет "];elem14[shape="Mrecord", label="Хз кто"];
+elem11->elem15[label = " нет "];elem15[shape="Mrecord", label="Киреев"];
+}

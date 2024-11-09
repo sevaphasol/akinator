@@ -5,12 +5,16 @@
 #include "tree_dump.h"
 #include "akinator.h"
 
-TreeDumpStatus Dump(Node_t* root, int file_number)
+static TreeDumpStatus MakeDotNode (Node_t* node, FILE* file, int* node_number);
+
+//================================================//
+
+TreeDumpStatus Dump(Node_t* root, const char* file_name)
 {
     VERIFY(!root, return TREE_DUMP_STRUCT_NULL_PTR_ERROR);
 
     char dot_file_name[FileNameBufSize] = {};
-    snprintf(dot_file_name, FileNameBufSize, "logs/dot_files/%03d.dot", file_number);
+    snprintf(dot_file_name, FileNameBufSize, LOGS_DIR "/" DOTS_DIR "/" "%s.dot", file_name);
 
     FILE* dot_file = fopen(dot_file_name, "w");
 
@@ -36,7 +40,7 @@ TreeDumpStatus Dump(Node_t* root, int file_number)
     fclose(dot_file);
 
     char png_file_name[FileNameBufSize] = {};
-    snprintf(png_file_name, FileNameBufSize, "logs/images/%03d.png", file_number);
+    snprintf(png_file_name, FileNameBufSize, LOGS_DIR "/" PNGS_DIR "/" "%s.png", file_name);
 
     char command[SysCommandBufSize] = {};
     snprintf(command, SysCommandBufSize, "touch %s; dot %s -Tpng -o %s",
@@ -55,14 +59,24 @@ TreeDumpStatus MakeDotNode(Node_t* node, FILE* file, int* node_number)
     ASSERT(file);
     ASSERT(node_number);
 
-    fprintf(file, "elem%d["
-                  "shape=\"Mrecord\", "
-                  "label=\"{ %d | data.is_question = %s | "
-                  "data.str = %s | left = %p | right = %p }"
-                  "\"];\n",
-                  *node_number, *node_number ,
-                   node->data.is_question ? "true" : "false",
-                   node->data.str, node->left, node->right);
+    if (node->data.is_question)
+    {
+        fprintf(file, "elem%d["
+                      "shape=\"Mrecord\", "
+                      "label=\"%s?\""
+                      "];\n",
+                      *node_number,
+                      node->data.str);
+    }
+    else
+    {
+        fprintf(file, "elem%d["
+                      "shape=\"Mrecord\", "
+                      "label=\"%s\""
+                      "];\n",
+                      *node_number,
+                      node->data.str);
+    }
 
     int head_node_number = *node_number;
 

@@ -2,47 +2,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include <data_base.h>
 
 #include "akinator.h"
+#include "data_base.h"
+#include "colors.h"
 #include "tree_dump.h"
 
-static AkinatorStatus RunGuessing   (Node_t* node);
-static AkinatorStatus AskQuestion   (Node_t* node);
-static AkinatorStatus JoinQuestion  (Node_t* node);
-static int            PrintQuestion (const char* str, ...);
-
-//================================================//
-
-AkinatorStatus RunAkinator()
-{
-    Node_t*  root = NodeCtor();
-
-    DataBase_t db = {};
-
-    VERIFY(ReadDB(&db, root),   return AKINATOR_READ_DB_ERROR);
-
-    RunGuessing(root); //TODO different modes
-
-    VERIFY(UpdateDB(&db, root), return AKINATOR_UPDATE_DB_ERROR);
-
-    return AKINATOR_SUCCESS;
-}
-
-//================================================//
-
-AkinatorStatus RunGuessing(Node_t* node)
-{
-    AskQuestion(node);
-
-    Dump(node, 1);
-
-    int ans  = PrintQuestion("Game is over. Do you want to play again?\n");
-
-    if (ans == 'y') RunGuessing(node);
-
-    return AKINATOR_SUCCESS;
-}
+static AkinatorStatus RunGuessing            (Node_t* node);
+static AkinatorStatus RecursivelyAskQuestion (Node_t* node);
+static AkinatorStatus JoinNewQuestion        (Node_t* node);
 
 //================================================//
 
@@ -53,35 +21,60 @@ Node_t* NodeCtor()
 
 //================================================//
 
-int PrintQuestion(const char* str, ...)
+AkinatorStatus RunAkinator()
 {
-	va_list list;
-    va_start(list, str);
+    Node_t*  root = NodeCtor();
 
-    vprintf(str, list);
-    int ans = getchar();
-    getchar();
+    DataBase_t db = {};
 
-    return ans;
-}
+    VERIFY(ReadDB(&db, root, DataBase), return AKINATOR_READ_DB_ERROR);
 
-//================================================//
+    Dump(root, DumpOriginDataBase);
 
-AkinatorStatus AskQuestion(Node_t* node)
-{
-    ASSERT(node);
+    int ans = 0;
 
-    VERIFY(!node->data.str, return AKINATOR_NULL_ARG_PTR_ERROR);
+    bool running_akinator = true;
 
-    int ans = PrintQuestion("%s?\n", node->data.str);
-
-    if (node->data.is_question)
+    while(running_akinator)
     {
-        (ans == 'y') ? AskQuestion(node->left) : AskQuestion(node->right);
+        ans = GetShortAnsColored(YellowColor,
+                                 "\nAkinator version 1.4.88\n"
+                                 "If you want to play guessing       mode, press [g]uess\n"
+                                 "If you want to play characteristic mode, press [c]haracteristic\n"
+                                 "If you want to play differnce      mode, press [d]ifference\n"
+                                 "If you want to      quit,                press [q]uit\n");
+
+        switch (ans)
+        {
+            case 'g':
+                VERIFY(RunGuessing(root), return AKINATOR_GUESSING_ERROR);
+                break;
+
+            case 'c':
+                ColorPrintf(BlueColor, "\nDeveloping...\n");
+                break;
+
+            case 'd':
+                ColorPrintf(BlueColor, "\nDeveloping...\n");
+                break;
+
+            case 'q':
+                running_akinator = false;
+                break;
+
+            default:
+                ColorPrintf(RedColor, "\nIncorrect input. Try again");
+                break;
+        }
     }
-    else
+
+    ans = GetShortAnsColored(TurquoiseColor, "\nUpdate data base?\n");
+
+    if (ans == 'y')
     {
-        if (ans != 'y') JoinQuestion(node);
+        VERIFY(UpdateDB(&db, root, DataBase), return AKINATOR_UPDATE_DB_ERROR);
+
+        Dump(root, DumpUpdatedDataBase);
     }
 
     return AKINATOR_SUCCESS;
@@ -89,24 +82,56 @@ AkinatorStatus AskQuestion(Node_t* node)
 
 //================================================//
 
-AkinatorStatus JoinQuestion(Node_t* node)
+AkinatorStatus RunGuessing(Node_t* node)
+{
+    VERIFY(RecursivelyAskQuestion(node), return AKINATOR_ASK_QUESTION_ERROR);
+
+    int ans = GetShortAnsColored(YellowColor, "\nGame is over. Do you want to play again?\n");
+
+    if (ans == 'y') RunGuessing(node);
+
+    return AKINATOR_SUCCESS;
+}
+
+//================================================//
+
+AkinatorStatus RecursivelyAskQuestion(Node_t* node)
+{
+    ASSERT(node);
+
+    VERIFY(!node->data.str, return AKINATOR_NULL_ARG_PTR_ERROR);
+
+    int ans = GetShortAnsColored(YellowColor, "\n%s?\n", node->data.str);
+
+    if (node->data.is_question)
+    {
+        (ans == 'y') ? RecursivelyAskQuestion(node->left) : RecursivelyAskQuestion(node->right);
+    }
+    else
+    {
+        if (ans != 'y') JoinNewQuestion(node);
+    }
+
+    return AKINATOR_SUCCESS;
+}
+
+//================================================//
+
+AkinatorStatus JoinNewQuestion(Node_t* node)
 {
     VERIFY(!node, return AKINATOR_NULL_ARG_PTR_ERROR);
 
-    printf("What is it then?\n");
-    char ans[NodeDataStrSize]  = {};
-    scanf("%[^\n]", ans);
-    getchar();
+    char* ans = GetLongAnsColored(PurpleColor,
+                                  "\nWhat is it then?\n");
 
-    printf("What is the difference between %s and %s?\n", ans, node->data.str);
-    char diff[NodeDataStrSize] = {};
-    scanf("%[^\n]", diff);
-    getchar();
+    char* diff = GetLongAnsColored(PurpleColor,
+                                   "\nWhat is the difference between %s and %s?\n",
+                                   ans, node->data.str);
 
     Node_t* left_node      = NodeCtor();
     VERIFY(!left_node, return AKINATOR_NODE_CTOR_ERROR);
 
-    left_node->data.str    = strdup(ans);
+    left_node->data.str    = ans;
     node->left             = left_node;
     node->left->level      = node->level + 1;
 
@@ -117,7 +142,7 @@ AkinatorStatus JoinQuestion(Node_t* node)
     node->right            = right_node;
     node->right->level     = node->level + 1;
 
-    node->data.str         = strdup(diff);
+    node->data.str         = diff;
     node->data.is_question = true;
 
     return AKINATOR_SUCCESS;

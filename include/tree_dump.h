@@ -25,10 +25,15 @@ if (!condition)                                                           \
     exit(EXIT_FAILURE);                                                   \
 }                                                                         \
 
+#define LOGS_DIR "logs"
+#define DOTS_DIR "dot_files"
+#define PNGS_DIR "images"
+
 //------------------------------------------------//
 
 const size_t FileNameBufSize          = 64;
 const size_t SysCommandBufSize        = 278;
+
 const char* const BackGroundColor     = "#bcbddc";
 const char* const NodeBackGroundColor = "#a1d99b";
 const char* const NodeBorderColor     = "#756bb1";
@@ -47,8 +52,7 @@ enum TreeDumpStatus
 
 //------------------------------------------------//
 
-TreeDumpStatus Dump        (Node_t* root, int file_number);
-TreeDumpStatus MakeDotNode (Node_t* node, FILE* file, int* node_number);
+TreeDumpStatus Dump (Node_t* root, const char* file_name);
 
 //------------------------------------------------//
 

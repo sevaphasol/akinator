@@ -27,9 +27,13 @@ if (!condition)                                                           \
 
 //------------------------------------------------//
 
-const size_t MinNumOfNodes     = 256;
+const char* const DumpOriginDataBase  = "DataBase";
+const char* const DumpUpdatedDataBase = "UpdatedDataBase";
 
-const size_t NodeDataStrSize   = 128;
+const char* const DataBase            = "DataBase.txt";
+
+const size_t MinNumOfNodes       = 256;
+const size_t NodeDataStrSize     = 128;
 
 //------------------------------------------------//
 
@@ -40,6 +44,8 @@ enum AkinatorStatus
     AKINATOR_READ_DB_ERROR,
     AKINATOR_UPDATE_DB_ERROR,
     AKINATOR_NODE_CTOR_ERROR,
+    AKINATOR_ASK_QUESTION_ERROR,
+    AKINATOR_GUESSING_ERROR,
 };
 
 //------------------------------------------------//
@@ -64,7 +70,7 @@ AkinatorStatus RunAkinator();
 
 //------------------------------------------------//
 
-Node_t*        NodeCtor  ();
+Node_t* NodeCtor();
 
 //------------------------------------------------//
 

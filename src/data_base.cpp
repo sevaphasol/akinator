@@ -9,7 +9,7 @@
 
 //------------------------------------------------//
 
-static DataBaseStatus ScanDB                  (DataBase_t* db);
+static DataBaseStatus ScanDB                  (DataBase_t* db, const char* file_name);
 static DataBaseStatus GetFileSize             (FILE* file_ptr, size_t* size);
 static DataBaseStatus DataBaseStringsCtor     (DataBase_t* db);
 
@@ -20,23 +20,24 @@ static DataBaseStatus RecursivelyUpdateString (DataBase_t* db, Node_t* node);
 
 //================================================//
 
-DataBaseStatus ScanDB(DataBase_t* db)
+DataBaseStatus ScanDB(DataBase_t* db, const char* file_name)
 {
     ASSERT(db);
+    ASSERT(file_name);
 
-    db->file = fopen(DataBaseName, "rb");
-    VERIFY(!db->file,    return DB_FILE_OPEN_ERROR);
+    db->origin_file = fopen(file_name, "rb");
+    VERIFY(!db->origin_file,    return DB_FILE_OPEN_ERROR);
 
-    VERIFY(GetFileSize(db->file, &db->size),
+    VERIFY(GetFileSize(db->origin_file, &db->size),
                         return DB_FILE_OPEN_ERROR);
 
     db->data = (char*) calloc(db->size, sizeof(char));
     VERIFY(!db->data,    return DB_ALLOCATE_ERROR);
 
-    VERIFY(fread(db->data, sizeof(char), db->size, db->file) != db->size,
+    VERIFY(fread(db->data, sizeof(char), db->size, db->origin_file) != db->size,
                         return DB_FILE_READ_ERROR);
 
-    fclose(db->file);
+    fclose(db->origin_file);
 
     return DB_SUCCESS;
 }
@@ -90,12 +91,13 @@ DataBaseStatus GetFileSize(FILE* file_ptr, size_t* size)
 
 //================================================//
 
-DataBaseStatus ReadDB(DataBase_t* db, Node_t* root)
+DataBaseStatus ReadDB(DataBase_t* db, Node_t* root, const char* file_name)
 {
-    ASSERT(db);
-    ASSERT(root);
+    VERIFY(!db,        return DB_STRUCT_NULL_PTR_ERROR);
+    VERIFY(!root,      return DB_NULL_PTR_ARG_ERROR);
+    VERIFY(!file_name, return DB_NULL_PTR_ARG_ERROR);
 
-    VERIFY(ScanDB(db),
+    VERIFY(ScanDB(db, file_name),
                     return DB_SCAN_FILE_ERROR);
 
     VERIFY(DataBaseStringsCtor(db),
@@ -155,17 +157,18 @@ DataBaseStatus RecursivelyReadString(DataBase_t* db, Node_t* node, int* cur_stri
 
 //================================================//
 
-DataBaseStatus UpdateDB(DataBase_t* db, Node_t* root)
+DataBaseStatus UpdateDB(DataBase_t* db, Node_t* root, const char* file_name)
 {
-    VERIFY(!db,     return DB_STRUCT_NULL_PTR_ERROR);
-    VERIFY(!root,   return DB_NULL_PTR_ARG_ERROR);
+    VERIFY(!db,        return DB_STRUCT_NULL_PTR_ERROR);
+    VERIFY(!root,      return DB_NULL_PTR_ARG_ERROR);
+    VERIFY(!file_name, return DB_NULL_PTR_ARG_ERROR);
 
-    db->file = fopen(DataBaseName, "w");
+    db->updated_file = fopen(file_name, "w");
 
     VERIFY(RecursivelyUpdateString(db, root),
                     return DB_UPDATE_STRING_ERROR);
 
-    fclose(db->file);
+    fclose(db->updated_file);
 
     return DB_SUCCESS;
 }
@@ -181,13 +184,13 @@ DataBaseStatus RecursivelyUpdateString(DataBase_t* db, Node_t* node)
 
     for (int i = 0; i < node->level; i++)
     {
-        fputc('\t', db->file);
+        fputc('\t', db->updated_file);
     }
 
     if (node->data.is_question)
     {
-        fprintf(db->file, "q: ");
-        fprintf(db->file, "%s\n", node->data.str);
+        fprintf(db->updated_file, "q: ");
+        fprintf(db->updated_file, "%s\n", node->data.str);
 
         VERIFY(RecursivelyUpdateString(db, node->left),
                             return DB_UPDATE_STRING_ERROR);
@@ -196,8 +199,8 @@ DataBaseStatus RecursivelyUpdateString(DataBase_t* db, Node_t* node)
     }
     else
     {
-        fprintf(db->file, "a: ");
-        fprintf(db->file, "%s\n", node->data.str);
+        fprintf(db->updated_file, "a: ");
+        fprintf(db->updated_file, "%s\n", node->data.str);
 
         return DB_SUCCESS;
     }
