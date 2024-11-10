@@ -10,6 +10,7 @@
 
 #include "akinator.h"
 #include "node_allocator.h"
+#include "string_allocator.h"
 
 //————————————————————————————————————————————————//
 
@@ -53,9 +54,15 @@ typedef struct DataBase
 
 //————————————————————————————————————————————————//
 
-DataBaseStatus ReadDB   (DataBase_t* db, Allocator_t* allocator,
-                         Node_t* root, const char* file_name);
-DataBaseStatus UpdateDB (DataBase_t* db, Node_t* root, const char* file_name);
+DataBaseStatus ReadDB   (DataBase_t*        db,
+                         NodeAllocator_t*   node_allocator,
+                         StringAllocator_t* string_allocator,
+                         Node_t*            root,
+                         const char*        file_name);
+
+DataBaseStatus UpdateDB (DataBase_t* db,
+                         Node_t*     root,
+                         const char* file_name);
 
 //————————————————————————————————————————————————//
 

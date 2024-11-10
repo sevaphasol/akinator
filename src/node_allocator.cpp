@@ -8,43 +8,43 @@
 
 //————————————————————————————————————————————————//
 
-static NodeAllocatorStatus BigArrayRealloc(Allocator_t* allocator);
-static NodeAllocatorStatus ArraysCalloc(Allocator_t* allocator);
+static NodeAllocatorStatus BigArrayRealloc(NodeAllocator_t* node_allocator);
+static NodeAllocatorStatus ArrayCalloc    (NodeAllocator_t* node_allocator);
 
 //————————————————————————————————————————————————//
 
-NodeAllocatorStatus AllocatorCtor(Allocator_t* allocator,
-                                  size_t n_arrays,
-                                  size_t n_nodes_in_array)
+NodeAllocatorStatus NodeAllocatorCtor(NodeAllocator_t* node_allocator,
+                                      size_t n_arrays,
+                                      size_t n_nodes_in_array)
 {
-    VERIFY(!allocator,
+    VERIFY(!node_allocator,
            return NODE_ALLOCATOR_STRUCT_NULL_PTR_ERROR);
 
     //------------------------------------------------//
 
-    allocator->n_arrays         = n_arrays;
+    node_allocator->n_arrays         = n_arrays;
 
-    allocator->big_array        = (Node_t**) calloc(n_arrays, sizeof(Node_t**));
-    VERIFY(!allocator->big_array,
+    node_allocator->big_array        = (Node_t**) calloc(n_arrays, sizeof(Node_t**));
+    VERIFY(!node_allocator->big_array,
            return NODE_ALLOCATORE_STD_CALLOC_ERROR);
 
     //------------------------------------------------//
 
-    allocator->n_nodes_in_array = n_nodes_in_array;
+    node_allocator->n_nodes_in_array = n_nodes_in_array;
 
     for (int i = 0; i < n_arrays; i++)
     {
-        allocator->big_array[i] = (Node_t*) calloc (n_nodes_in_array, sizeof(Node_t*));
-        VERIFY(!allocator->big_array[i],
+        node_allocator->big_array[i] = (Node_t*) calloc (n_nodes_in_array, sizeof(Node_t*));
+        VERIFY(!node_allocator->big_array[i],
                return NODE_ALLOCATORE_STD_CALLOC_ERROR);
     }
 
-    allocator->free_place = 0;
+    node_allocator->free_place = 0;
 
     //------------------------------------------------//
 
-    allocator->answers = (Node_t**) calloc (n_nodes_in_array, sizeof(Node_t*));
-    VERIFY(!allocator->answers,
+    node_allocator->answers = (Node_t**) calloc (n_nodes_in_array, sizeof(Node_t*));
+    VERIFY(!node_allocator->answers,
            return NODE_ALLOCATORE_STD_CALLOC_ERROR);
 
     //------------------------------------------------//
@@ -54,29 +54,29 @@ NodeAllocatorStatus AllocatorCtor(Allocator_t* allocator,
 
 //================================================//
 
-NodeAllocatorStatus AllocatorDtor(Allocator_t* allocator)
+NodeAllocatorStatus NodeAllocatorDtor(NodeAllocator_t* node_allocator)
 {
-    VERIFY(!allocator,
+    VERIFY(!node_allocator,
            return NODE_ALLOCATOR_STRUCT_NULL_PTR_ERROR);
 
     //------------------------------------------------//
 
-    for (int i = 0; i < allocator->n_arrays; i++)
+    for (int i = 0; i < node_allocator->n_arrays; i++)
     {
-        free(allocator->big_array[i]);
+        free(node_allocator->big_array[i]);
     }
 
-    free(allocator->big_array);
+    free(node_allocator->big_array);
 
-    allocator->free_place       = 0;
-    allocator->n_arrays         = 0;
-    allocator->n_nodes_in_array = 0;
+    node_allocator->free_place       = 0;
+    node_allocator->n_arrays         = 0;
+    node_allocator->n_nodes_in_array = 0;
 
     //------------------------------------------------//
 
-    free(allocator->answers);
+    free(node_allocator->answers);
 
-    allocator->n_answers = 0;
+    node_allocator->n_answers = 0;
 
     //------------------------------------------------//
 
@@ -85,9 +85,9 @@ NodeAllocatorStatus AllocatorDtor(Allocator_t* allocator)
 
 //================================================//
 
-NodeAllocatorStatus NodeCtor(Allocator* allocator, Node_t** new_node)
+NodeAllocatorStatus NodeCtor(NodeAllocator* node_allocator, Node_t** new_node)
 {
-    VERIFY(!allocator,
+    VERIFY(!node_allocator,
             return NODE_ALLOCATOR_STRUCT_NULL_PTR_ERROR);
 
     VERIFY(!new_node,
@@ -95,23 +95,23 @@ NodeAllocatorStatus NodeCtor(Allocator* allocator, Node_t** new_node)
 
     //------------------------------------------------//
 
-    if (allocator->free_place >= allocator->n_arrays * allocator->n_nodes_in_array)
+    if (node_allocator->free_place >= node_allocator->n_arrays * node_allocator->n_nodes_in_array)
     {
-        VERIFY(BigArrayRealloc(allocator),
+        VERIFY(BigArrayRealloc(node_allocator),
                return NODE_ALLOCATOR_BIG_ARRAY_REALLOC_ERROR);
 
-        VERIFY(ArraysCalloc   (allocator),
+        VERIFY(ArrayCalloc(node_allocator),
                return NODE_ALLOCATOR_ARRAYS_CALLOC_ERROR);
     }
 
     //------------------------------------------------//
 
-    size_t cur_array      = allocator->free_place / allocator->n_nodes_in_array;
-    size_t rel_free_place = allocator->free_place % allocator->n_nodes_in_array;
+    size_t cur_array      = node_allocator->free_place / node_allocator->n_nodes_in_array;
+    size_t rel_free_place = node_allocator->free_place % node_allocator->n_nodes_in_array;
 
-    *new_node = &allocator->big_array[cur_array][rel_free_place];
+    *new_node = &node_allocator->big_array[cur_array][rel_free_place];
 
-    allocator->free_place++;
+    node_allocator->free_place++;
 
     //------------------------------------------------//
 
@@ -120,14 +120,14 @@ NodeAllocatorStatus NodeCtor(Allocator* allocator, Node_t** new_node)
 
 //================================================//
 
-NodeAllocatorStatus BigArrayRealloc(Allocator_t* allocator)
+NodeAllocatorStatus BigArrayRealloc(NodeAllocator_t* node_allocator)
 {
     return NODE_ALLOCATOR_SUCCESS;
 }
 
 //================================================//
 
-NodeAllocatorStatus ArraysCalloc(Allocator_t* allocator)
+NodeAllocatorStatus ArrayCalloc(NodeAllocator_t* node_allocator)
 {
     return NODE_ALLOCATOR_SUCCESS;
 }

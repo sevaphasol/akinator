@@ -3,10 +3,6 @@
 
 //————————————————————————————————————————————————//
 
-#include "akinator.h"
-
-//————————————————————————————————————————————————//
-
 enum NodeAllocatorStatus
 {
     NODE_ALLOCATOR_SUCCESS = 0,
@@ -37,7 +33,7 @@ typedef struct Node
 
 //------------------------------------------------//
 
-typedef struct Allocator
+typedef struct NodeAllocator
 {
     size_t   n_arrays;
     size_t   n_nodes_in_array;
@@ -46,19 +42,19 @@ typedef struct Allocator
 
     size_t   n_answers;
     Node_t** answers;
-} Allocator_t;
+} NodeAllocator_t;
 
 //————————————————————————————————————————————————//
 
-NodeAllocatorStatus AllocatorCtor (Allocator_t* allocator,
-                                   size_t n_arrays,
-                                   size_t n_nodes_in_array);
+NodeAllocatorStatus NodeAllocatorCtor (NodeAllocator_t* node_allocator,
+                                       size_t n_arrays,
+                                       size_t n_nodes_in_array);
 
-NodeAllocatorStatus AllocatorDtor (Allocator_t* allocator);
+NodeAllocatorStatus NodeAllocatorDtor (NodeAllocator_t* allocator);
 
 //------------------------------------------------//
 
-NodeAllocatorStatus NodeCtor      (Allocator_t* allocator, Node_t** node);
+NodeAllocatorStatus NodeCtor      (NodeAllocator_t* node_allocator, Node_t** node);
 
 //————————————————————————————————————————————————//
 

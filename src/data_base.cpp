@@ -20,8 +20,12 @@ static size_t         CountNumberOfStrings    (char* text);
 
 //------------------------------------------------//
 
-static DataBaseStatus RecursivelyReadString   (DataBase_t* db, Allocator_t* allocator,
-                                               Node_t* node, int* cur_string);
+static DataBaseStatus RecursivelyReadString   (DataBase_t*        db,
+                                               NodeAllocator_t*   node_allocator,
+                                               StringAllocator_t* string_allocator,
+                                               Node_t*            node,
+                                               int*               cur_string);
+
 static DataBaseStatus RecursivelyUpdateString (DataBase_t* db, Node_t* node);
 
 //————————————————————————————————————————————————//
@@ -128,8 +132,11 @@ DataBaseStatus GetFileSize(FILE* file_ptr, size_t* size)
 
 //================================================//
 
-DataBaseStatus ReadDB(DataBase_t* db, Allocator_t* allocator,
-                      Node_t* root, const char* file_name)
+DataBaseStatus ReadDB(DataBase_t*        db,
+                      NodeAllocator_t*   node_allocator,
+                      StringAllocator_t* string_allocator,
+                      Node_t*            root,
+                      const char*        file_name)
 {
     VERIFY(!db,
            return DB_STRUCT_NULL_PTR_ERROR);
@@ -150,7 +157,7 @@ DataBaseStatus ReadDB(DataBase_t* db, Allocator_t* allocator,
 
     int cur_string = 0;
 
-    VERIFY(RecursivelyReadString(db, allocator, root, &cur_string),
+    VERIFY(RecursivelyReadString(db, node_allocator, string_allocator, root, &cur_string),
            return DB_READ_STRING_ERROR);
 
     VERIFY(cur_string != db->n_strings,
@@ -163,10 +170,13 @@ DataBaseStatus ReadDB(DataBase_t* db, Allocator_t* allocator,
 
 //================================================//
 
-DataBaseStatus RecursivelyReadString   (DataBase_t* db, Allocator_t* allocator,
-                                        Node_t* node, int* cur_string)
+DataBaseStatus RecursivelyReadString(DataBase_t*        db,
+                                     NodeAllocator_t*   node_allocator,
+                                     StringAllocator_t* string_allocator,
+                                     Node_t*            node,
+                                     int*               cur_string)
 {
-    ASSERT(allocator);
+    ASSERT(node_allocator);
     ASSERT(db);
     ASSERT(node);
     ASSERT(cur_string);
@@ -180,11 +190,13 @@ DataBaseStatus RecursivelyReadString   (DataBase_t* db, Allocator_t* allocator,
 
     char character = 0;
 
-    sscanf(db->strings[(*cur_string)++], "%c: %m[^\n]", &character, &node->data.str);
+    GetStrPtr(string_allocator, &node->data.str);
+
+    sscanf(db->strings[(*cur_string)++], "%c: %[^\n]", &character, node->data.str);
 
     if (character == 'a')
     {
-        allocator->answers[allocator->n_answers++] = node;
+        node_allocator->answers[node_allocator->n_answers++] = node;
         node->data.is_question = false;
 
         return DB_SUCCESS;
@@ -198,19 +210,19 @@ DataBaseStatus RecursivelyReadString   (DataBase_t* db, Allocator_t* allocator,
     node->data.is_question = true;
 
     node->left = nullptr;
-    NodeCtor(allocator, &node->left);
+    NodeCtor(node_allocator, &node->left);
     VERIFY(!node->left,             return DB_ALLOCATE_ERROR);
 
     node->left->level  = node->level + 1;
-    VERIFY(RecursivelyReadString(db, allocator, node->left,  cur_string),
+    VERIFY(RecursivelyReadString(db, node_allocator, string_allocator, node->left,  cur_string),
                                     return DB_READ_STRING_ERROR);
 
     node->right = nullptr;
-    NodeCtor(allocator, &node->right);
+    NodeCtor(node_allocator, &node->right);
     VERIFY(!node->right,            return DB_ALLOCATE_ERROR);
 
     node->right->level = node->level + 1;
-    VERIFY(RecursivelyReadString(db, allocator, node->right, cur_string),
+    VERIFY(RecursivelyReadString(db, node_allocator, string_allocator, node->right, cur_string),
                                     return DB_READ_STRING_ERROR);
 
     //------------------------------------------------//
@@ -246,7 +258,7 @@ DataBaseStatus UpdateDB(DataBase_t* db, Node_t* root, const char* file_name)
 
 //================================================//
 
-DataBaseStatus RecursivelyUpdateString(DataBase_t* db, Node_t* node)
+DataBaseStatus RecursivelyUpdateString(DataBase_t* db, Node_t* node) //TODO setvbuf
 {
     ASSERT(db);
     ASSERT(node);

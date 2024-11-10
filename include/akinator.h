@@ -9,6 +9,7 @@
 //------------------------------------------------//
 
 #include "node_allocator.h"
+#include "string_allocator.h"
 
 //————————————————————————————————————————————————//
 
@@ -19,8 +20,11 @@ const char* const DataBase            = "DataBase.txt";
 
 //------------------------------------------------//
 
-const size_t NumOfNodesInAllocatedArray = 1024;
-const size_t NumOfAllocatedArrays       = 1;
+const size_t NumOfNodesInAllocatedArray   = 1024;
+const size_t NumOfAllocatedNodeArrays     = 1;
+
+const size_t NumOfStringsInAllocatedArray = 1024;
+const size_t NumOfAllocatedStringArrays   = 1;
 
 //————————————————————————————————————————————————//
 
@@ -33,11 +37,13 @@ enum AkinatorStatus
     AKINATOR_NODE_CTOR_ERROR,
     AKINATOR_ASK_QUESTION_ERROR,
     AKINATOR_GUESSING_ERROR,
+    AKINATOR_GET_STR_PTR_ERROR,
 };
 
 //————————————————————————————————————————————————//
 
-AkinatorStatus RunAkinator(Allocator_t* allocator);
+AkinatorStatus RunAkinator(NodeAllocator_t*   node_allocator,
+                           StringAllocator_t* string_allocator);
 
 //————————————————————————————————————————————————//
 

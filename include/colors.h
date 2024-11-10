@@ -21,11 +21,6 @@ void  ColorPrintf        (const char* color_code, const char* str, ...);
 void  SetColor           (const char* color_code);
 void  ResetColor         ();
 
-//------------------------------------------------//
-
-int   GetShortAnsColored (const char* color_code, const char* str, ...);
-char* GetLongAnsColored  (const char* color_code, const char* str, ...);
-
 //————————————————————————————————————————————————//
 
 #endif // COLORS_H__

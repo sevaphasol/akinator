@@ -14,35 +14,53 @@
 
 //————————————————————————————————————————————————//
 
-static AkinatorStatus RunGuessing            (Allocator_t* allocator, Node_t* node);
-static AkinatorStatus RecursivelyAskQuestion (Allocator_t* allocator, Node_t* node);
-static AkinatorStatus JoinNewQuestion        (Allocator_t* allocator, Node_t* node);
+int   GetShortAnsColored (const char* color_code, const char* str, ...);
+AkinatorStatus GetLongAnsColored  (StringAllocator_t* string_allocator,
+                                   char*              ret_ptr,
+                                   const char*        color_code,
+                                   const char*        str, ...);
 
 //------------------------------------------------//
 
-static AkinatorStatus RunCharacteristic      (Node_t* root);
+static AkinatorStatus RunGuessing            (NodeAllocator_t*   node_allocator,
+                                              StringAllocator_t* string_allocator,
+                                              Node_t* node);
+
+static AkinatorStatus RecursivelyAskQuestion (NodeAllocator_t*   node_allocator,
+                                              StringAllocator_t* string_allocator,
+                                              Node_t* node);
+
+static AkinatorStatus JoinNewQuestion        (NodeAllocator_t*   node_allocator,
+                                              StringAllocator_t* string_allocator,
+                                              Node_t* node);
 
 //------------------------------------------------//
 
-static AkinatorStatus RunDifference          (Node_t* root);
+static AkinatorStatus RunCharacteristic      (StringAllocator_t* string_allocator, Node_t* root);
+
+//------------------------------------------------//
+
+static AkinatorStatus RunDifference          (StringAllocator_t* string_allocator, Node_t* root);
 
 //————————————————————————————————————————————————//
 
-AkinatorStatus RunAkinator(Allocator_t* allocator)
+AkinatorStatus RunAkinator(NodeAllocator_t* node_allocator, StringAllocator_t* string_allocator)
 {
-    VERIFY(!allocator,
+    VERIFY(!node_allocator,
            return AKINATOR_NULL_ARG_PTR_ERROR);
 
+    VERIFY(!string_allocator,
+           return AKINATOR_NULL_ARG_PTR_ERROR);
     //------------------------------------------------//
 
     Node_t* root = nullptr;
-    NodeCtor(allocator, &root);
+    NodeCtor(node_allocator, &root);
 
     //------------------------------------------------//
 
     DataBase_t db = {};
 
-    VERIFY(ReadDB(&db, allocator, root, DataBase),
+    VERIFY(ReadDB(&db, node_allocator, string_allocator, root, DataBase),
            return AKINATOR_READ_DB_ERROR);
 
     Dump(root, DumpOriginDataBase);
@@ -65,17 +83,17 @@ AkinatorStatus RunAkinator(Allocator_t* allocator)
         switch (ans)
         {
             case 'g':
-                VERIFY(RunGuessing(allocator, root),
+                VERIFY(RunGuessing(node_allocator, string_allocator, root),
                        return AKINATOR_GUESSING_ERROR);
                 break;
 
             case 'c':
-                VERIFY(RunCharacteristic(root),
+                VERIFY(RunCharacteristic(string_allocator, root),
                        return AKINATOR_GUESSING_ERROR);
                 break;
 
             case 'd':
-                VERIFY(RunDifference(root),
+                VERIFY(RunDifference(string_allocator, root),
                        return AKINATOR_GUESSING_ERROR);
                 break;
 
@@ -108,20 +126,66 @@ AkinatorStatus RunAkinator(Allocator_t* allocator)
 
 //================================================//
 
-AkinatorStatus RunGuessing(Allocator_t* allocator, Node_t* node)
+int GetShortAnsColored(const char* color_code, const char* str, ...)
 {
-    ASSERT(node);
+    ASSERT(color_code);
+    ASSERT(str);
 
     //------------------------------------------------//
 
-    VERIFY(RecursivelyAskQuestion(allocator, node),
-           return AKINATOR_ASK_QUESTION_ERROR);
+	va_list list;
+    va_start(list, str);
 
     //------------------------------------------------//
 
-    int ans = GetShortAnsColored(YellowColor, "\nGame is over. Do you want to play again?\n");
+	SetColor(color_code);
+    vprintf(str, list);
+	ResetColor();
 
-    if (ans == 'y') RunGuessing(allocator, node);
+    //------------------------------------------------//
+
+    va_end(list);
+
+    //------------------------------------------------//
+
+    int ans = getchar();
+    getchar();
+
+    //------------------------------------------------//
+
+    return ans;
+}
+
+//================================================//
+
+AkinatorStatus GetLongAnsColored(StringAllocator_t* string_allocator,
+                                 char**             ret_ptr,
+                                 const char*        color_code,
+                                 const char*        str, ...)
+{
+    ASSERT(string_allocator);
+    ASSERT(ret_ptr);
+    ASSERT(color_code);
+    ASSERT(str);
+
+    //------------------------------------------------//
+
+	va_list list;
+    va_start(list, str);
+
+	SetColor(color_code);
+    vprintf(str, list);
+	ResetColor();
+
+    va_end(list);
+
+    //------------------------------------------------//
+
+    VERIFY(GetStrPtr(string_allocator, ret_ptr),
+           return AKINATOR_GET_STR_PTR_ERROR);
+
+    scanf("%[^\n]", *ret_ptr);
+    getchar();
 
     //------------------------------------------------//
 
@@ -130,7 +194,33 @@ AkinatorStatus RunGuessing(Allocator_t* allocator, Node_t* node)
 
 //================================================//
 
-AkinatorStatus RecursivelyAskQuestion(Allocator_t* allocator, Node_t* node)
+AkinatorStatus RunGuessing(NodeAllocator_t*   node_allocator,
+                           StringAllocator_t* string_allocator,
+                           Node_t* node)
+{
+    ASSERT(node);
+
+    //------------------------------------------------//
+
+    VERIFY(RecursivelyAskQuestion(node_allocator, string_allocator, node),
+           return AKINATOR_ASK_QUESTION_ERROR);
+
+    //------------------------------------------------//
+
+    int ans = GetShortAnsColored(YellowColor, "\nGame is over. Do you want to play again?\n");
+
+    if (ans == 'y') RunGuessing(node_allocator, string_allocator, node);
+
+    //------------------------------------------------//
+
+    return AKINATOR_SUCCESS;
+}
+
+//================================================//
+
+AkinatorStatus RecursivelyAskQuestion(NodeAllocator_t*   node_allocator,
+                                      StringAllocator_t* string_allocator,
+                                      Node_t* node)
 {
     ASSERT(node);
 
@@ -145,11 +235,18 @@ AkinatorStatus RecursivelyAskQuestion(Allocator_t* allocator, Node_t* node)
 
     if (node->data.is_question)
     {
-        (ans == 'y') ? RecursivelyAskQuestion(allocator, node->left) : RecursivelyAskQuestion(allocator, node->right);
+        if (ans == 'y')
+        {
+            RecursivelyAskQuestion(node_allocator, string_allocator, node->left);
+        }
+        else
+        {
+            RecursivelyAskQuestion(node_allocator, string_allocator, node->right);
+        }
     }
     else
     {
-        if (ans != 'y') JoinNewQuestion(allocator, node);
+        if (ans != 'y') JoinNewQuestion(node_allocator, string_allocator, node);
     }
 
     //------------------------------------------------//
@@ -159,24 +256,36 @@ AkinatorStatus RecursivelyAskQuestion(Allocator_t* allocator, Node_t* node)
 
 //================================================//
 
-AkinatorStatus JoinNewQuestion(Allocator_t* allocator, Node_t* node)
+AkinatorStatus JoinNewQuestion(NodeAllocator_t*   node_allocator,
+                               StringAllocator_t* string_allocator,
+                               Node_t* node)
 {
-    VERIFY(!node,
-           return AKINATOR_NULL_ARG_PTR_ERROR);
+    ASSERT(node_allocator);
+    ASSERT(string_allocator);
+    ASSERT(node)
 
     //------------------------------------------------//
 
-    char* ans  = GetLongAnsColored(PurpleColor,
-                                   "\nWhat is it then?\n");
+    char* ans = nullptr;
 
-    char* diff = GetLongAnsColored(PurpleColor,
-                                   "\nWhat is the difference between %s and %s?\n",
-                                   ans, node->data.str);
+    GetLongAnsColored(string_allocator,
+                      &ans,
+                      PurpleColor,
+                      "\nWhat is it then?\n");
+
+
+    char* diff = nullptr;
+
+    GetLongAnsColored(string_allocator,
+                      &diff,
+                      PurpleColor,
+                      "\nWhat is the difference between %s and %s?\n",
+                      ans, node->data.str);
 
     //------------------------------------------------//
 
     Node_t* left_node      = nullptr;
-    NodeCtor(allocator, &left_node);
+    NodeCtor(node_allocator, &left_node);
     VERIFY(!left_node,
            return AKINATOR_NODE_CTOR_ERROR);
 
@@ -184,8 +293,8 @@ AkinatorStatus JoinNewQuestion(Allocator_t* allocator, Node_t* node)
     node->left             = left_node;
     node->left->level      = node->level + 1;
 
-    Node_t* right_node      = nullptr;
-    NodeCtor(allocator, &right_node);
+    Node_t* right_node     = nullptr;
+    NodeCtor(node_allocator, &right_node);
     VERIFY(!left_node,
            return AKINATOR_NODE_CTOR_ERROR);
 
@@ -203,22 +312,33 @@ AkinatorStatus JoinNewQuestion(Allocator_t* allocator, Node_t* node)
 
 //================================================//
 
-AkinatorStatus RunCharacteristic(Node_t* root)
+AkinatorStatus RunCharacteristic(StringAllocator_t* string_allocator, Node_t* root)
 {
-    char* hero = GetLongAnsColored(PurpleColor,
-                                   "\nWhose characteristic do you want me to tell?\n");
+    char* hero = nullptr;
+    GetLongAnsColored(string_allocator,
+                      &hero,
+                      PurpleColor,
+                      "\nWhose characteristic do you want me to tell?\n");
 
     return AKINATOR_SUCCESS;
 }
 
 //================================================//
 
-AkinatorStatus RunDifference(Node_t* root)
+AkinatorStatus RunDifference(StringAllocator_t* string_allocator, Node_t* root)
 {
-    char* hero1 = GetLongAnsColored(PurpleColor,
-                                    "\nWhich heroes difference do you want me to tell?\n");
+    char* hero1 = nullptr;
+    char* hero2 = nullptr;
 
-    char* hero2 = GetLongAnsColored(PurpleColor, "");
+    GetLongAnsColored(string_allocator,
+                      &hero1,
+                      PurpleColor,
+                      "\nWhich heroes difference do you want me to tell?\n");
+
+    GetLongAnsColored(string_allocator,
+                      &hero2,
+                      PurpleColor,
+                      "");
 
     return AKINATOR_SUCCESS;
 }
