@@ -43,8 +43,10 @@ typedef struct DataBase
 {
     FILE*       origin_file;
     FILE*       updated_file;
+
     size_t      size;
     char*       data;
+
     size_t      n_strings;
     char**      strings;
 } DataBase_t;

@@ -30,14 +30,24 @@ static AkinatorStatus RunDifference          (Node_t* root);
 
 AkinatorStatus RunAkinator(Allocator_t* allocator)
 {
+    VERIFY(!allocator,
+           return AKINATOR_NULL_ARG_PTR_ERROR);
+
+    //------------------------------------------------//
+
     Node_t* root = nullptr;
     NodeCtor(allocator, &root);
 
+    //------------------------------------------------//
+
     DataBase_t db = {};
 
-    VERIFY(ReadDB(&db, allocator, root, DataBase), return AKINATOR_READ_DB_ERROR);
+    VERIFY(ReadDB(&db, allocator, root, DataBase),
+           return AKINATOR_READ_DB_ERROR);
 
     Dump(root, DumpOriginDataBase);
+
+    //------------------------------------------------//
 
     int ans = 0;
 
@@ -79,14 +89,19 @@ AkinatorStatus RunAkinator(Allocator_t* allocator)
         }
     }
 
+    //------------------------------------------------//
+
     ans = GetShortAnsColored(TurquoiseColor, "\nUpdate data base?\n");
 
     if (ans == 'y')
     {
-        VERIFY(UpdateDB(&db, root, DataBase), return AKINATOR_UPDATE_DB_ERROR);
+        VERIFY(UpdateDB(&db, root, DataBase),
+               return AKINATOR_UPDATE_DB_ERROR);
 
         Dump(root, DumpUpdatedDataBase);
     }
+
+    //------------------------------------------------//
 
     return AKINATOR_SUCCESS;
 }
@@ -97,12 +112,18 @@ AkinatorStatus RunGuessing(Allocator_t* allocator, Node_t* node)
 {
     ASSERT(node);
 
+    //------------------------------------------------//
+
     VERIFY(RecursivelyAskQuestion(allocator, node),
            return AKINATOR_ASK_QUESTION_ERROR);
+
+    //------------------------------------------------//
 
     int ans = GetShortAnsColored(YellowColor, "\nGame is over. Do you want to play again?\n");
 
     if (ans == 'y') RunGuessing(allocator, node);
+
+    //------------------------------------------------//
 
     return AKINATOR_SUCCESS;
 }
@@ -113,7 +134,12 @@ AkinatorStatus RecursivelyAskQuestion(Allocator_t* allocator, Node_t* node)
 {
     ASSERT(node);
 
-    VERIFY(!node->data.str, return AKINATOR_NULL_ARG_PTR_ERROR);
+    //------------------------------------------------//
+
+    VERIFY(!node->data.str,
+           return AKINATOR_NULL_ARG_PTR_ERROR);
+
+    //------------------------------------------------//
 
     int ans = GetShortAnsColored(YellowColor, "\n%s?\n", node->data.str);
 
@@ -126,6 +152,8 @@ AkinatorStatus RecursivelyAskQuestion(Allocator_t* allocator, Node_t* node)
         if (ans != 'y') JoinNewQuestion(allocator, node);
     }
 
+    //------------------------------------------------//
+
     return AKINATOR_SUCCESS;
 }
 
@@ -133,18 +161,24 @@ AkinatorStatus RecursivelyAskQuestion(Allocator_t* allocator, Node_t* node)
 
 AkinatorStatus JoinNewQuestion(Allocator_t* allocator, Node_t* node)
 {
-    VERIFY(!node, return AKINATOR_NULL_ARG_PTR_ERROR);
+    VERIFY(!node,
+           return AKINATOR_NULL_ARG_PTR_ERROR);
 
-    char* ans = GetLongAnsColored(PurpleColor,
-                                  "\nWhat is it then?\n");
+    //------------------------------------------------//
+
+    char* ans  = GetLongAnsColored(PurpleColor,
+                                   "\nWhat is it then?\n");
 
     char* diff = GetLongAnsColored(PurpleColor,
                                    "\nWhat is the difference between %s and %s?\n",
                                    ans, node->data.str);
 
+    //------------------------------------------------//
+
     Node_t* left_node      = nullptr;
     NodeCtor(allocator, &left_node);
-    VERIFY(!left_node, return AKINATOR_NODE_CTOR_ERROR);
+    VERIFY(!left_node,
+           return AKINATOR_NODE_CTOR_ERROR);
 
     left_node->data.str    = ans;
     node->left             = left_node;
@@ -152,7 +186,8 @@ AkinatorStatus JoinNewQuestion(Allocator_t* allocator, Node_t* node)
 
     Node_t* right_node      = nullptr;
     NodeCtor(allocator, &right_node);
-    VERIFY(!left_node, return AKINATOR_NODE_CTOR_ERROR);
+    VERIFY(!left_node,
+           return AKINATOR_NODE_CTOR_ERROR);
 
     right_node->data.str   = node->data.str;
     node->right            = right_node;
@@ -160,6 +195,8 @@ AkinatorStatus JoinNewQuestion(Allocator_t* allocator, Node_t* node)
 
     node->data.str         = diff;
     node->data.is_question = true;
+
+    //------------------------------------------------//
 
     return AKINATOR_SUCCESS;
 }

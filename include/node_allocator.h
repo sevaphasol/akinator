@@ -28,7 +28,9 @@ typedef struct NodeData
 typedef struct Node
 {
     int        level;
+
     NodeData_t data;
+
     Node*      left;
     Node*      right;
 } Node_t;
@@ -40,8 +42,10 @@ typedef struct Allocator
     size_t   n_arrays;
     size_t   n_nodes_in_array;
     Node_t** big_array;
-    Node_t*  answers;
     int      free_place;
+
+    size_t   n_answers;
+    Node_t** answers;
 } Allocator_t;
 
 //————————————————————————————————————————————————//

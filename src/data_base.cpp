@@ -31,8 +31,12 @@ DataBaseStatus ScanDB(DataBase_t* db, const char* file_name)
     ASSERT(db);
     ASSERT(file_name);
 
+    //------------------------------------------------//
+
     db->origin_file = fopen(file_name, "rb");
     VERIFY(!db->origin_file,    return DB_FILE_OPEN_ERROR);
+
+    //------------------------------------------------//
 
     VERIFY(GetFileSize(db->origin_file, &db->size),
                         return DB_FILE_OPEN_ERROR);
@@ -43,7 +47,11 @@ DataBaseStatus ScanDB(DataBase_t* db, const char* file_name)
     VERIFY(fread(db->data, sizeof(char), db->size, db->origin_file) != db->size,
                         return DB_FILE_READ_ERROR);
 
+    //------------------------------------------------//
+
     fclose(db->origin_file);
+
+    //------------------------------------------------//
 
     return DB_SUCCESS;
 }
@@ -54,10 +62,14 @@ DataBaseStatus DataBaseStringsCtor(DataBase_t* db)
 {
     ASSERT(db);
 
+    //------------------------------------------------//
+
     db->n_strings = CountNumberOfStrings(db->data);
 
     db->strings = (char**) calloc(db->n_strings, sizeof(char*));
     VERIFY(!db->data, return DB_ALLOCATE_ERROR);
+
+    //------------------------------------------------//
 
     db->strings[0] = strtok(db->data, Delim);
 
@@ -65,6 +77,8 @@ DataBaseStatus DataBaseStringsCtor(DataBase_t* db)
     {
         db->strings[i] = strtok(nullptr, Delim);
     }
+
+    //------------------------------------------------//
 
     return DB_SUCCESS;
 }
@@ -75,6 +89,8 @@ size_t CountNumberOfStrings(char* text)
 {
     ASSERT(text);
 
+    //------------------------------------------------//
+
     int n_strings = 0;
 
     char* cursor = text;
@@ -83,6 +99,8 @@ size_t CountNumberOfStrings(char* text)
         n_strings++;
         cursor++;
     }
+
+    //------------------------------------------------//
 
     return n_strings;
 }
@@ -94,12 +112,16 @@ DataBaseStatus GetFileSize(FILE* file_ptr, size_t* size)
     ASSERT(file_ptr);
     ASSERT(size);
 
+    //------------------------------------------------//
+
     struct stat file_status = {};
 
     VERIFY((fstat(fileno(file_ptr), &file_status) < 0),
                         return DB_GET_FILE_SIZE_ERROR);
 
     *size = file_status.st_size;
+
+    //------------------------------------------------//
 
     return DB_SUCCESS;
 }
@@ -109,23 +131,32 @@ DataBaseStatus GetFileSize(FILE* file_ptr, size_t* size)
 DataBaseStatus ReadDB(DataBase_t* db, Allocator_t* allocator,
                       Node_t* root, const char* file_name)
 {
-    VERIFY(!db,        return DB_STRUCT_NULL_PTR_ERROR);
-    VERIFY(!root,      return DB_NULL_PTR_ARG_ERROR);
-    VERIFY(!file_name, return DB_NULL_PTR_ARG_ERROR);
+    VERIFY(!db,
+           return DB_STRUCT_NULL_PTR_ERROR);
+    VERIFY(!root,
+           return DB_NULL_PTR_ARG_ERROR);
+    VERIFY(!file_name,
+           return DB_NULL_PTR_ARG_ERROR);
+
+    //------------------------------------------------//
 
     VERIFY(ScanDB(db, file_name),
-                    return DB_SCAN_FILE_ERROR);
+           return DB_SCAN_FILE_ERROR);
 
     VERIFY(DataBaseStringsCtor(db),
-                    return DB_STRINGS_CTOR_ERROR);
+           return DB_STRINGS_CTOR_ERROR);
+
+    //------------------------------------------------//
 
     int cur_string = 0;
 
     VERIFY(RecursivelyReadString(db, allocator, root, &cur_string),
-                    return DB_READ_STRING_ERROR);
+           return DB_READ_STRING_ERROR);
 
     VERIFY(cur_string != db->n_strings,
-                    return DB_READ_FILE_ERROR);
+           return DB_READ_FILE_ERROR);
+
+    //------------------------------------------------//
 
     return DB_SUCCESS;
 }
@@ -140,8 +171,12 @@ DataBaseStatus RecursivelyReadString   (DataBase_t* db, Allocator_t* allocator,
     ASSERT(node);
     ASSERT(cur_string);
 
+    //------------------------------------------------//
+
     VERIFY((*cur_string < 0) || (*cur_string >= db->n_strings),
                                     return DB_RECURSION_ERROR);
+
+    //------------------------------------------------//
 
     char character = 0;
 
@@ -149,12 +184,16 @@ DataBaseStatus RecursivelyReadString   (DataBase_t* db, Allocator_t* allocator,
 
     if (character == 'a')
     {
+        allocator->answers[allocator->n_answers++] = node;
         node->data.is_question = false;
 
         return DB_SUCCESS;
     }
 
-    VERIFY(character != 'q',        return DB_INPUT_FILE_FORMAT_ERROR);
+    VERIFY(character != 'q',
+           return DB_INPUT_FILE_FORMAT_ERROR);
+
+    //------------------------------------------------//
 
     node->data.is_question = true;
 
@@ -174,6 +213,8 @@ DataBaseStatus RecursivelyReadString   (DataBase_t* db, Allocator_t* allocator,
     VERIFY(RecursivelyReadString(db, allocator, node->right, cur_string),
                                     return DB_READ_STRING_ERROR);
 
+    //------------------------------------------------//
+
     return DB_SUCCESS;
 }
 
@@ -185,12 +226,20 @@ DataBaseStatus UpdateDB(DataBase_t* db, Node_t* root, const char* file_name)
     VERIFY(!root,      return DB_NULL_PTR_ARG_ERROR);
     VERIFY(!file_name, return DB_NULL_PTR_ARG_ERROR);
 
+    //------------------------------------------------//
+
     db->updated_file = fopen(file_name, "w");
+
+    //------------------------------------------------//
 
     VERIFY(RecursivelyUpdateString(db, root),
                     return DB_UPDATE_STRING_ERROR);
 
+    //------------------------------------------------//
+
     fclose(db->updated_file);
+
+    //------------------------------------------------//
 
     return DB_SUCCESS;
 }
@@ -202,7 +251,11 @@ DataBaseStatus RecursivelyUpdateString(DataBase_t* db, Node_t* node)
     ASSERT(db);
     ASSERT(node);
 
+    //------------------------------------------------//
+
     VERIFY(!node->data.str, return DB_NULL_PTR_ARG_ERROR)
+
+    //------------------------------------------------//
 
     for (int i = 0; i < node->level; i++)
     {
@@ -226,6 +279,8 @@ DataBaseStatus RecursivelyUpdateString(DataBase_t* db, Node_t* node)
 
         return DB_SUCCESS;
     }
+
+    //------------------------------------------------//
 
     return DB_SUCCESS;
 }
