@@ -1,11 +1,11 @@
 #ifndef NODE_ALLOCATOR_H__
 #define NODE_ALLOCATOR_H__
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 #include "akinator.h"
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 enum NodeAllocatorStatus
 {
@@ -17,7 +17,7 @@ enum NodeAllocatorStatus
     NODE_ALLOCATOR_ARRAYS_CALLOC_ERROR,
 };
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 typedef struct NodeData
 {
@@ -33,6 +33,8 @@ typedef struct Node
     Node*      right;
 } Node_t;
 
+//------------------------------------------------//
+
 typedef struct Allocator
 {
     size_t   n_arrays;
@@ -42,7 +44,7 @@ typedef struct Allocator
     int      free_place;
 } Allocator_t;
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 NodeAllocatorStatus AllocatorCtor (Allocator_t* allocator,
                                    size_t n_arrays,
@@ -50,8 +52,10 @@ NodeAllocatorStatus AllocatorCtor (Allocator_t* allocator,
 
 NodeAllocatorStatus AllocatorDtor (Allocator_t* allocator);
 
+//------------------------------------------------//
+
 NodeAllocatorStatus NodeCtor      (Allocator_t* allocator, Node_t** node);
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 #endif // NODE_ALLOCATOR_H__

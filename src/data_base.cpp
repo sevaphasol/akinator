@@ -4,12 +4,14 @@
 #include <sys/stat.h>
 #include <assert.h>
 
+//------------------------------------------------//
+
 #include "data_base.h"
 #include "akinator.h"
 #include "node_allocator.h"
 #include "custom_assert.h"
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 static DataBaseStatus ScanDB                  (DataBase_t* db, const char* file_name);
 static DataBaseStatus GetFileSize             (FILE* file_ptr, size_t* size);
@@ -22,7 +24,7 @@ static DataBaseStatus RecursivelyReadString   (DataBase_t* db, Allocator_t* allo
                                                Node_t* node, int* cur_string);
 static DataBaseStatus RecursivelyUpdateString (DataBase_t* db, Node_t* node);
 
-//================================================//
+//————————————————————————————————————————————————//
 
 DataBaseStatus ScanDB(DataBase_t* db, const char* file_name)
 {
@@ -228,4 +230,4 @@ DataBaseStatus RecursivelyUpdateString(DataBase_t* db, Node_t* node)
     return DB_SUCCESS;
 }
 
-//================================================//
+//————————————————————————————————————————————————//

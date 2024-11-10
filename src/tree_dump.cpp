@@ -2,13 +2,17 @@
 #include <string.h>
 #include <syscall.h>
 
+//------------------------------------------------//
+
 #include "tree_dump.h"
 #include "akinator.h"
 #include "custom_assert.h"
 
+//————————————————————————————————————————————————//
+
 static TreeDumpStatus MakeDotNode (Node_t* node, FILE* file, int* node_number);
 
-//================================================//
+//————————————————————————————————————————————————//
 
 TreeDumpStatus Dump(Node_t* root, const char* file_name)
 {
@@ -104,4 +108,4 @@ TreeDumpStatus MakeDotNode(Node_t* node, FILE* file, int* node_number)
     return TREE_DUMP_SUCCESS;
 }
 
-//================================================//
+//————————————————————————————————————————————————//

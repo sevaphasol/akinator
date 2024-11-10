@@ -2,10 +2,12 @@
 #include <string.h>
 #include <stdarg.h>
 
+//------------------------------------------------//
+
 #include "colors.h"
 #include "custom_assert.h"
 
-//================================================//
+//————————————————————————————————————————————————//
 
 void ColorPrintf(const char* color_code, const char *str, ...)
 {
@@ -83,4 +85,4 @@ char* GetLongAnsColored(const char* color_code, const char* str, ...)
     return ret_ans;
 }
 
-//================================================//
+//————————————————————————————————————————————————//

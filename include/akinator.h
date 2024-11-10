@@ -1,24 +1,28 @@
 #ifndef AKINATOR_H__
 #define AKINATOR_H__
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "node_allocator.h"
-
 //------------------------------------------------//
 
-const char* const DumpOriginDataBase    = "DataBase";
-const char* const DumpUpdatedDataBase   = "UpdatedDataBase";
+#include "node_allocator.h"
 
-const char* const DataBase              = "DataBase.txt";
+//————————————————————————————————————————————————//
+
+const char* const DumpOriginDataBase  = "DataBase";
+const char* const DumpUpdatedDataBase = "UpdatedDataBase";
+
+const char* const DataBase            = "DataBase.txt";
+
+//------------------------------------------------//
 
 const size_t NumOfNodesInAllocatedArray = 1024;
 const size_t NumOfAllocatedArrays       = 1;
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 enum AkinatorStatus
 {
@@ -31,10 +35,10 @@ enum AkinatorStatus
     AKINATOR_GUESSING_ERROR,
 };
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 AkinatorStatus RunAkinator(Allocator_t* allocator);
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 #endif // AKINATOR_H__

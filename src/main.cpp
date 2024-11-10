@@ -1,10 +1,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+//------------------------------------------------//
+
 #include "akinator.h"
 #include "data_base.h"
 #include "node_allocator.h"
 #include "custom_assert.h"
+
+//————————————————————————————————————————————————//
 
 int main()
 {
@@ -22,3 +26,5 @@ int main()
 
     return EXIT_SUCCESS;
 }
+
+//————————————————————————————————————————————————//

@@ -1,11 +1,11 @@
 #ifndef CUSTOM_ASSERT_H__
 #define CUSTOM_ASSERT_H__
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 #include <stdio.h>
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 /* Acts like an usual assert, but does exit(EXIT_FAILURE) instead of abort()
    Provided for saving info in currently writing files when programm stops. */
@@ -26,6 +26,6 @@ if (condition)                                                            \
     action;                                                               \
 }                                                                         \
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 #endif

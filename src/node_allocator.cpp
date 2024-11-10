@@ -1,15 +1,17 @@
 #include <stdlib.h>
 
+//------------------------------------------------//
+
 #include "akinator.h"
 #include "node_allocator.h"
 #include "custom_assert.h"
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 static NodeAllocatorStatus BigArrayRealloc(Allocator_t* allocator);
 static NodeAllocatorStatus ArraysCalloc(Allocator_t* allocator);
 
-//================================================//
+//————————————————————————————————————————————————//
 
 NodeAllocatorStatus AllocatorCtor(Allocator_t* allocator,
                                   size_t n_arrays,
@@ -98,4 +100,4 @@ NodeAllocatorStatus ArraysCalloc(Allocator_t* allocator)
     return NODE_ALLOCATOR_SUCCESS;
 }
 
-//================================================//
+//————————————————————————————————————————————————//

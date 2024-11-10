@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdarg.h>
 
+//------------------------------------------------//
+
 #include "akinator.h"
 #include "data_base.h"
 #include "colors.h"
@@ -10,7 +12,7 @@
 #include "node_allocator.h"
 #include "custom_assert.h"
 
-//------------------------------------------------//
+//————————————————————————————————————————————————//
 
 static AkinatorStatus RunGuessing            (Allocator_t* allocator, Node_t* node);
 static AkinatorStatus RecursivelyAskQuestion (Allocator_t* allocator, Node_t* node);
@@ -24,7 +26,7 @@ static AkinatorStatus RunCharacteristic      (Node_t* root);
 
 static AkinatorStatus RunDifference          (Node_t* root);
 
-//================================================//
+//————————————————————————————————————————————————//
 
 AkinatorStatus RunAkinator(Allocator_t* allocator)
 {
@@ -184,4 +186,4 @@ AkinatorStatus RunDifference(Node_t* root)
     return AKINATOR_SUCCESS;
 }
 
-//================================================//
+//————————————————————————————————————————————————//
