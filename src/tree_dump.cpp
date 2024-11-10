@@ -4,6 +4,7 @@
 
 #include "tree_dump.h"
 #include "akinator.h"
+#include "custom_assert.h"
 
 static TreeDumpStatus MakeDotNode (Node_t* node, FILE* file, int* node_number);
 

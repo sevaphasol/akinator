@@ -7,6 +7,7 @@
 #include "data_base.h"
 #include "akinator.h"
 #include "node_allocator.h"
+#include "custom_assert.h"
 
 //------------------------------------------------//
 

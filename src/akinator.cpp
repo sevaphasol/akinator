@@ -8,6 +8,7 @@
 #include "colors.h"
 #include "tree_dump.h"
 #include "node_allocator.h"
+#include "custom_assert.h"
 
 //------------------------------------------------//
 
@@ -52,15 +53,18 @@ AkinatorStatus RunAkinator(Allocator_t* allocator)
         switch (ans)
         {
             case 'g':
-                VERIFY(RunGuessing(allocator, root), return AKINATOR_GUESSING_ERROR);
+                VERIFY(RunGuessing(allocator, root),
+                       return AKINATOR_GUESSING_ERROR);
                 break;
 
             case 'c':
-                VERIFY(RunCharacteristic(root),      return AKINATOR_GUESSING_ERROR);
+                VERIFY(RunCharacteristic(root),
+                       return AKINATOR_GUESSING_ERROR);
                 break;
 
             case 'd':
-                VERIFY(RunDifference(root),          return AKINATOR_GUESSING_ERROR);
+                VERIFY(RunDifference(root),
+                       return AKINATOR_GUESSING_ERROR);
                 break;
 
             case 'q':
@@ -91,7 +95,8 @@ AkinatorStatus RunGuessing(Allocator_t* allocator, Node_t* node)
 {
     ASSERT(node);
 
-    VERIFY(RecursivelyAskQuestion(allocator, node), return AKINATOR_ASK_QUESTION_ERROR);
+    VERIFY(RecursivelyAskQuestion(allocator, node),
+           return AKINATOR_ASK_QUESTION_ERROR);
 
     int ans = GetShortAnsColored(YellowColor, "\nGame is over. Do you want to play again?\n");
 

@@ -17,18 +17,6 @@ const char* const TurquoiseColor = "\033[36m";
 
 //------------------------------------------------//
 
-/* Acts like an usual assert, but does exit(EXIT_FAILURE) instead of abort()
-   Provided for saving info in currently writing files when programm stops. */
-#define ASSERT(condition)                                                 \
-if (!condition)                                                           \
-{                                                                         \
-    fprintf(stderr, "%s:%d: %s: Assertion `%s' failed.\n",                \
-                    __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition); \
-    exit(EXIT_FAILURE);                                                   \
-}                                                                         \
-
-//------------------------------------------------//
-
 void  ColorPrintf        (const char* color_code, const char* str, ...);
 void  SetColor           (const char* color_code);
 void  ResetColor         ();

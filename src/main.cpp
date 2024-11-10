@@ -4,19 +4,21 @@
 #include "akinator.h"
 #include "data_base.h"
 #include "node_allocator.h"
+#include "custom_assert.h"
 
 int main()
 {
     Allocator_t allocator = {};
-    AllocatorCtor(&allocator,
-                  NumOfAllocatedArrays,
-                  NumOfNodesInAllocatedArray);
+    VERIFY(AllocatorCtor(&allocator,
+                         NumOfAllocatedArrays,
+                         NumOfNodesInAllocatedArray),
+           return EXIT_FAILURE);
 
-    AkinatorStatus status = RunAkinator(&allocator);
+    VERIFY(RunAkinator(&allocator),
+           return EXIT_FAILURE);
 
-    VERIFY(status, return EXIT_FAILURE);
-
-    AllocatorDtor(&allocator);
+    VERIFY(AllocatorDtor(&allocator),
+           return EXIT_FAILURE);;
 
     return EXIT_SUCCESS;
 }
