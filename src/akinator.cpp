@@ -7,6 +7,7 @@
 
 #include "akinator.h"
 #include "data_base.h"
+#include "stack.h"
 #include "colors.h"
 #include "tree_dump.h"
 #include "node_allocator.h"
@@ -15,6 +16,7 @@
 //————————————————————————————————————————————————//
 
 int   GetShortAnsColored (const char* color_code, const char* str, ...);
+
 AkinatorStatus GetLongAnsColored  (StringAllocator_t* string_allocator,
                                    char*              ret_ptr,
                                    const char*        color_code,
@@ -34,23 +36,31 @@ static AkinatorStatus JoinNewQuestion         (NodeAllocator_t*   node_allocator
                                                StringAllocator_t* string_allocator,
                                                Node_t* node);
 
-//------------------------------------------- -----//
+//------------------------------------------------//
+
+static AkinatorStatus PushHeroCharacteristic  (NodeAllocator_t* node_allocator,
+                                               StackId_t stk,
+                                               Node_t* hero_node);
+
+//------------------------------------------------//
 
 static AkinatorStatus RunCharacteristic       (NodeAllocator_t*   node_allocator,
                                                StringAllocator_t* string_allocator,
+                                               StackId_t stk,
                                                Node_t* root);
 
 static AkinatorStatus FindAnswer              (NodeAllocator_t* node_allocator,
                                                char* hero,
                                                Node_t** ret_root);
 
-static AkinatorStatus PrintHeroCharacteristic (NodeAllocator_t* node_allocator,
-                                               Node_t* hero_node);
+static AkinatorStatus PrintHeroCharacteristic (StackId_t stk, size_t level);
+
 
 //------------------------------------------- -----//
 
 static AkinatorStatus RunDifference           (NodeAllocator_t* node_allocator,
                                                StringAllocator_t* string_allocator,
+                                               StackId_t stk1, StackId_t stk2,
                                                Node_t* root);
 
 static AkinatorStatus PrintHeroesDiffernce    (NodeAllocator_t* node_allocator,
@@ -80,6 +90,11 @@ AkinatorStatus RunAkinator(NodeAllocator_t* node_allocator, StringAllocator_t* s
 
     //------------------------------------------------//
 
+    StackId_t stk1 = STACK_CTOR(node_allocator->tree_level);
+    StackId_t stk2 = STACK_CTOR(node_allocator->tree_level);
+
+    //------------------------------------------------//
+
     int ans = 0;
 
     bool running_akinator = true;
@@ -101,12 +116,18 @@ AkinatorStatus RunAkinator(NodeAllocator_t* node_allocator, StringAllocator_t* s
                 break;
 
             case 'c':
-                VERIFY(RunCharacteristic(node_allocator, string_allocator, root),
+                VERIFY(RunCharacteristic(node_allocator,
+                                         string_allocator,
+                                         stk1,
+                                         root),
                        return AKINATOR_GUESSING_ERROR);
                 break;
 
             case 'd':
-                VERIFY(RunDifference(node_allocator, string_allocator, root),
+                VERIFY(RunDifference(node_allocator,
+                                     string_allocator,
+                                     stk1, stk2,
+                                     root),
                        return AKINATOR_GUESSING_ERROR);
                 break;
 
@@ -129,8 +150,8 @@ AkinatorStatus RunAkinator(NodeAllocator_t* node_allocator, StringAllocator_t* s
         VERIFY(UpdateDB(&db, root, DataBase),
                return AKINATOR_UPDATE_DB_ERROR);
 
-        Dump(root, DumpUpdatedDataBase);
     }
+    Dump(root, DumpUpdatedDataBase);
 
     //------------------------------------------------//
 
@@ -302,6 +323,7 @@ AkinatorStatus JoinNewQuestion(NodeAllocator_t*   node_allocator,
            return AKINATOR_NODE_CTOR_ERROR);
 
     left_node->data.str    = ans;
+    node_allocator->answers[node_allocator->n_answers++] = left_node;
     node->left             = left_node;
     node->left->level      = node->level + 1;
 
@@ -324,29 +346,25 @@ AkinatorStatus JoinNewQuestion(NodeAllocator_t*   node_allocator,
 
 //================================================//
 
-AkinatorStatus RunCharacteristic(NodeAllocator_t* node_allocator,
-                                 StringAllocator_t* string_allocator,
-                                 Node_t* root)
+AkinatorStatus PushHeroCharacteristic(NodeAllocator_t* node_allocator,
+                                      StackId_t stk,
+                                      Node_t* hero_node)
 {
-    char* hero = nullptr;
-    GetLongAnsColored(string_allocator,
-                      &hero,
-                      PurpleColor,
-                      "\nWhose characteristic do you want me to tell?\n");
+    ASSERT(node_allocator);
+    ASSERT(hero_node);
 
-    Node_t* hero_node = nullptr;
+    Node_t* cur_node = hero_node->parent;
 
-    if (FindAnswer(node_allocator,
-                   hero,
-                   &hero_node) == AKINATOR_NO_ANSWER_FOUND)
+    while (cur_node)
     {
-        ColorPrint(RedColor, "There is no %s in my database.\n", hero);
+        StackPush(stk, cur_node);
 
-        return AKINATOR_SUCCESS;
+        cur_node = cur_node->parent;
     }
 
-    VERIFY(PrintHeroCharacteristic(node_allocator, hero_node),
-           return AKINATOR_PRINT_HERO_CHARAC_ERROR);
+    StackPush(stk, hero_node);
+
+    SpecialStackDump(stk);
 
     return AKINATOR_SUCCESS;
 }
@@ -380,21 +398,53 @@ AkinatorStatus FindAnswer(NodeAllocator_t* node_allocator,
 
 //================================================//
 
-AkinatorStatus PrintHeroCharacteristic(NodeAllocator_t* node_allocator,
-                                       Node_t* hero_node)
+AkinatorStatus RunCharacteristic(NodeAllocator_t* node_allocator,
+                                 StringAllocator_t* string_allocator,
+                                 StackId_t stk,
+                                 Node_t* root)
 {
-    ASSERT(node_allocator);
-    ASSERT(hero_node);
+    char* hero = nullptr;
+    GetLongAnsColored(string_allocator,
+                      &hero,
+                      PurpleColor,
+                      "\nWhose characteristic do you want me to tell?\n");
 
-    Node_t* cur_node     = hero_node;
+    Node_t* hero_node = nullptr;
+
+    if (FindAnswer(node_allocator,
+                   hero,
+                   &hero_node) == AKINATOR_NO_ANSWER_FOUND)
+    {
+        ColorPrint(RedColor, "There is no %s in my database.\n", hero);
+
+        return AKINATOR_SUCCESS;
+    }
+
+    VERIFY(PushHeroCharacteristic(node_allocator, stk, hero_node),
+           return AKINATOR_PUSH_HERO_CHARACTERISTIC_ERROR);
+
+    VERIFY(PrintHeroCharacteristic(stk, hero_node->level),
+           return AKINATOR_PRINT_HERO_CHARACTERISTIC_ERROR);
+
+    return AKINATOR_SUCCESS;
+}
+
+//================================================//
+
+AkinatorStatus PrintHeroCharacteristic(StackId_t stk, size_t level)
+{
     bool positive_answer = true;
 
-    while (cur_node)
+    ColorPrint(TurquoiseColor, "%s это ", StackPop(stk)->data.str);
+
+    while (level != 0)
     {
+        Node_t* cur_node = StackPop(stk);
+        positive_answer  = cur_node->left_to_parent;
+
         ColorPrint(TurquoiseColor, "%s%s ", positive_answer ? "" : "не ", cur_node->data.str);
 
-        positive_answer = cur_node->left_to_parent;
-        cur_node = cur_node->parent;
+        level--;
     }
 
     putchar('\n');
@@ -406,6 +456,7 @@ AkinatorStatus PrintHeroCharacteristic(NodeAllocator_t* node_allocator,
 
 AkinatorStatus RunDifference(NodeAllocator_t* node_allocator,
                              StringAllocator_t* string_allocator,
+                             StackId_t stk1, StackId_t stk2,
                              Node_t* root)
 {
     ASSERT(node_allocator);
@@ -454,8 +505,8 @@ AkinatorStatus RunDifference(NodeAllocator_t* node_allocator,
 
     PrintHeroesDiffernce(node_allocator, hero_node1, hero_node2);
 
-    PrintHeroCharacteristic(node_allocator, hero_node1);
-    PrintHeroCharacteristic(node_allocator, hero_node2);
+    // PrintHeroCharacteristic(node_allocator, hero_node1);
+    // PrintHeroCharacteristic(node_allocator, hero_node2);
 
     return AKINATOR_SUCCESS;
 }
