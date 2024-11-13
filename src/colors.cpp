@@ -9,7 +9,7 @@
 
 //————————————————————————————————————————————————//
 
-void ColorPrintf(const char* color_code, const char *str, ...)
+void ColorPrint(const char* color_code, const char *str, ...)
 {
     ASSERT(color_code);
     ASSERT(str);

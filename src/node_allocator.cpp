@@ -14,8 +14,8 @@ static NodeAllocatorStatus ArrayCalloc    (NodeAllocator_t* node_allocator);
 //————————————————————————————————————————————————//
 
 NodeAllocatorStatus NodeAllocatorCtor(NodeAllocator_t* node_allocator,
-                                      size_t n_arrays,
-                                      size_t n_nodes_in_array)
+                                      size_t           n_arrays,
+                                      size_t           n_nodes_in_array)
 {
     VERIFY(!node_allocator,
            return NODE_ALLOCATOR_STRUCT_NULL_PTR_ERROR);
@@ -85,7 +85,10 @@ NodeAllocatorStatus NodeAllocatorDtor(NodeAllocator_t* node_allocator)
 
 //================================================//
 
-NodeAllocatorStatus NodeCtor(NodeAllocator* node_allocator, Node_t** new_node)
+NodeAllocatorStatus NodeCtor(NodeAllocator* node_allocator,
+                             Node_t**       new_node,
+                             Node_t*        parent,
+                             bool           left_to_parent)
 {
     VERIFY(!node_allocator,
             return NODE_ALLOCATOR_STRUCT_NULL_PTR_ERROR);
@@ -112,6 +115,19 @@ NodeAllocatorStatus NodeCtor(NodeAllocator* node_allocator, Node_t** new_node)
     *new_node = &node_allocator->big_array[cur_array][rel_free_place];
 
     node_allocator->free_place++;
+
+    //------------------------------------------------//
+
+    (*new_node)->parent         = parent;
+    (*new_node)->left_to_parent = left_to_parent;
+
+    //------------------------------------------------//
+
+    size_t level       = 0;
+    if (parent) {level = parent->level + 1;}
+    (*new_node)->level = level;
+
+    if (level > node_allocator->tree_level) {node_allocator->tree_level = level;}
 
     //------------------------------------------------//
 

@@ -23,9 +23,12 @@ typedef struct NodeData
 
 typedef struct Node
 {
-    int        level;
+    size_t     level;
 
     NodeData_t data;
+
+    Node*      parent;
+    bool       left_to_parent;
 
     Node*      left;
     Node*      right;
@@ -42,19 +45,24 @@ typedef struct NodeAllocator
 
     size_t   n_answers;
     Node_t** answers;
+
+    size_t   tree_level;
 } NodeAllocator_t;
 
 //————————————————————————————————————————————————//
 
 NodeAllocatorStatus NodeAllocatorCtor (NodeAllocator_t* node_allocator,
-                                       size_t n_arrays,
-                                       size_t n_nodes_in_array);
+                                       size_t           n_arrays,
+                                       size_t           n_nodes_in_array);
 
 NodeAllocatorStatus NodeAllocatorDtor (NodeAllocator_t* allocator);
 
 //------------------------------------------------//
 
-NodeAllocatorStatus NodeCtor      (NodeAllocator_t* node_allocator, Node_t** node);
+NodeAllocatorStatus NodeCtor          (NodeAllocator_t* node_allocator,
+                                       Node_t**         node,
+                                       Node_t*          parent,
+                                       bool             left_to_parent);
 
 //————————————————————————————————————————————————//
 

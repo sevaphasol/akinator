@@ -10,7 +10,7 @@
 
 //————————————————————————————————————————————————//
 
-static TreeDumpStatus MakeDotNode (Node_t* node, FILE* file, int* node_number);
+static TreeDumpStatus RecursivelyMakeDotNode (Node_t* node, FILE* file, int* node_number);
 
 //————————————————————————————————————————————————//
 
@@ -42,7 +42,7 @@ TreeDumpStatus Dump(Node_t* root, const char* file_name)
     //------------------------------------------------//
 
     int node_number = 1;
-    MakeDotNode(root, dot_file, &node_number);
+    RecursivelyMakeDotNode(root, dot_file, &node_number);
 
     fputs("}\n", dot_file);
     fclose(dot_file);
@@ -65,32 +65,24 @@ TreeDumpStatus Dump(Node_t* root, const char* file_name)
 
 //================================================//
 
-TreeDumpStatus MakeDotNode(Node_t* node, FILE* file, int* node_number)
+TreeDumpStatus RecursivelyMakeDotNode(Node_t* node, FILE* file, int* node_number)
 {
     ASSERT(node);
+    ASSERT(node->data.str);
     ASSERT(file);
     ASSERT(node_number);
 
     //------------------------------------------------//
 
-    if (node->data.is_question)
-    {
-        fprintf(file, "elem%d["
-                      "shape=\"Mrecord\", "
-                      "label=\"%s?\""
-                      "];\n",
-                      *node_number,
-                      node->data.str);
-    }
-    else
-    {
-        fprintf(file, "elem%d["
-                      "shape=\"Mrecord\", "
-                      "label=\"%s\""
-                      "];\n",
-                      *node_number,
-                      node->data.str);
-    }
+    fprintf(file, "elem%d["
+                    "shape=\"Mrecord\", "
+                    "label= \"{%s%s | parent = %s | is_left_to_parent = %s | level = %ld}\""
+                    "];\n",
+                    *node_number,
+                    node->data.str, node->data.is_question ? "?" : "",
+                    node->parent ? node->parent->data.str : "no parent",
+                    node->left_to_parent ? "true" : "false",
+                    node->level);
 
     //------------------------------------------------//
 
@@ -103,7 +95,7 @@ TreeDumpStatus MakeDotNode(Node_t* node, FILE* file, int* node_number)
         fprintf(file, "elem%d->elem%d[label = \" да \"];",
                       head_node_number, left_node_number);
 
-        MakeDotNode(node->left, file, node_number);
+        RecursivelyMakeDotNode(node->left, file, node_number);
     }
 
     if (node->right)
@@ -113,7 +105,7 @@ TreeDumpStatus MakeDotNode(Node_t* node, FILE* file, int* node_number)
         fprintf(file, "elem%d->elem%d[label = \" нет \"];",
                        head_node_number, right_node_number);
 
-        MakeDotNode(node->right, file, node_number);
+        RecursivelyMakeDotNode(node->right, file, node_number);
     }
 
     //------------------------------------------------//

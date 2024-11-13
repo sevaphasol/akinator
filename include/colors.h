@@ -17,9 +17,9 @@ const char* const TurquoiseColor = "\033[36m";
 
 //————————————————————————————————————————————————//
 
-void  ColorPrintf        (const char* color_code, const char* str, ...);
-void  SetColor           (const char* color_code);
-void  ResetColor         ();
+void  ColorPrint (const char* color_code, const char* str, ...);
+void  SetColor   (const char* color_code);
+void  ResetColor ();
 
 //————————————————————————————————————————————————//
 

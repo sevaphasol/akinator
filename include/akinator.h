@@ -38,6 +38,8 @@ enum AkinatorStatus
     AKINATOR_ASK_QUESTION_ERROR,
     AKINATOR_GUESSING_ERROR,
     AKINATOR_GET_STR_PTR_ERROR,
+    AKINATOR_NO_ANSWER_FOUND,
+    AKINATOR_PRINT_HERO_CHARAC_ERROR,
 };
 
 //————————————————————————————————————————————————//

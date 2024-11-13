@@ -23,7 +23,7 @@ static size_t         CountNumberOfStrings    (char* text);
 static DataBaseStatus RecursivelyReadString   (DataBase_t*        db,
                                                NodeAllocator_t*   node_allocator,
                                                StringAllocator_t* string_allocator,
-                                               Node_t*            node,
+                                               Node_t*            parent,
                                                int*               cur_string);
 
 static DataBaseStatus RecursivelyUpdateString (DataBase_t* db, Node_t* node);
@@ -173,12 +173,12 @@ DataBaseStatus ReadDB(DataBase_t*        db,
 DataBaseStatus RecursivelyReadString(DataBase_t*        db,
                                      NodeAllocator_t*   node_allocator,
                                      StringAllocator_t* string_allocator,
-                                     Node_t*            node,
+                                     Node_t*            parent,
                                      int*               cur_string)
 {
     ASSERT(node_allocator);
     ASSERT(db);
-    ASSERT(node);
+    ASSERT(parent);
     ASSERT(cur_string);
 
     //------------------------------------------------//
@@ -190,14 +190,14 @@ DataBaseStatus RecursivelyReadString(DataBase_t*        db,
 
     char character = 0;
 
-    GetStrPtr(string_allocator, &node->data.str);
+    GetStrPtr(string_allocator, &parent->data.str);
 
-    sscanf(db->strings[(*cur_string)++], "%c: %[^\n]", &character, node->data.str);
+    sscanf(db->strings[(*cur_string)++], "%c: %[^\n]", &character, parent->data.str); // String structure
 
     if (character == 'a')
     {
-        node_allocator->answers[node_allocator->n_answers++] = node;
-        node->data.is_question = false;
+        node_allocator->answers[node_allocator->n_answers++] = parent;
+        parent->data.is_question = false;
 
         return DB_SUCCESS;
     }
@@ -207,24 +207,24 @@ DataBaseStatus RecursivelyReadString(DataBase_t*        db,
 
     //------------------------------------------------//
 
-    node->data.is_question = true;
+    parent->data.is_question = true;
 
-    node->left = nullptr;
-    NodeCtor(node_allocator, &node->left);
-    VERIFY(!node->left,             return DB_ALLOCATE_ERROR);
+    parent->left = nullptr;
+    NodeCtor(node_allocator, &parent->left, parent, true);
+    VERIFY(!parent->left,             return DB_ALLOCATE_ERROR);
 
-    node->left->level  = node->level + 1;
-    VERIFY(RecursivelyReadString(db, node_allocator, string_allocator, node->left,  cur_string),
+    parent->left->level  = parent->level + 1;
+    VERIFY(RecursivelyReadString(db, node_allocator, string_allocator, parent->left,  cur_string),
                                     return DB_READ_STRING_ERROR);
 
-    node->right = nullptr;
-    NodeCtor(node_allocator, &node->right);
-    VERIFY(!node->right,            return DB_ALLOCATE_ERROR);
+    parent->right = nullptr;
+    NodeCtor(node_allocator, &parent->right, parent, false);
+    VERIFY(!parent->right,            return DB_ALLOCATE_ERROR);
 
-    node->right->level = node->level + 1;
-    VERIFY(RecursivelyReadString(db, node_allocator, string_allocator, node->right, cur_string),
+    parent->right->level = parent->level + 1;
+    VERIFY(RecursivelyReadString(db, node_allocator, string_allocator, parent->right, cur_string),
                                     return DB_READ_STRING_ERROR);
-
+// Espeak Festival
     //------------------------------------------------//
 
     return DB_SUCCESS;

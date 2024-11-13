@@ -23,7 +23,7 @@ StringAllocatorStatus StringAllocatorCtor(StringAllocator_t* string_allocator,
 
     string_allocator->n_arrays  = n_arrays;
 
-    string_allocator->big_array = (String_t**) calloc(n_arrays, sizeof(String_t**));
+    string_allocator->big_array = (String_t**) calloc(n_arrays, sizeof(String_t**)); // buffer char**
     VERIFY(!string_allocator->big_array,
            return STRING_ALLOCATORE_STD_CALLOC_ERROR);
 
