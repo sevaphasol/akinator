@@ -53,7 +53,8 @@ static AkinatorStatus FindAnswer              (NodeAllocator_t* node_allocator,
                                                char*            hero,
                                                Node_t**         ret_root);
 
-static AkinatorStatus PrintHeroCharacteristic (std::stack<Answer_t>* stk, size_t level);
+static AkinatorStatus PrintHeroCharacteristic (std::stack<Answer_t>* stk,
+                                               Node_t*               hero_node);
 
 
 //------------------------------------------- -----//
@@ -269,10 +270,11 @@ AkinatorStatus RecursivelyAskQuestion(NodeAllocator_t*   node_allocator,
 
     //-------------------------------------------------------------------//
 
-    int ans = GetShortAnsColored(PurpleColor, "\n%s?\n", node->data.str);
 
     if (node->data.is_question)
     {
+        int ans = GetShortAnsColored(PurpleColor, "\n%s?\n", node->data.str);
+
         if (ans == 'y')
         {
             RecursivelyAskQuestion(node_allocator, string_allocator, node->left);
@@ -284,6 +286,8 @@ AkinatorStatus RecursivelyAskQuestion(NodeAllocator_t*   node_allocator,
     }
     else
     {
+        int ans = GetShortAnsColored(PurpleColor, "\nThis is %s?\n", node->data.str);
+
         if (ans != 'y') JoinNewQuestion(node_allocator, string_allocator, node);
     }
 
@@ -372,10 +376,6 @@ AkinatorStatus PushHeroCharacteristic(NodeAllocator_t*      node_allocator,
         cur_answer  = {.node = cur_answer.node->parent};
     }
 
-    cur_answer = {.node = hero_node};
-
-    (*stk).push(cur_answer);
-
     return AKINATOR_SUCCESS;
 }
 
@@ -438,7 +438,7 @@ AkinatorStatus RunCharacteristic(NodeAllocator_t*      node_allocator,
     VERIFY(PushHeroCharacteristic(node_allocator, stk, hero_node),
            return AKINATOR_PUSH_HERO_CHARACTERISTIC_ERROR);
 
-    VERIFY(PrintHeroCharacteristic(stk, hero_node->level),
+    VERIFY(PrintHeroCharacteristic(stk, hero_node),
            return AKINATOR_PRINT_HERO_CHARACTERISTIC_ERROR);
 
     return AKINATOR_SUCCESS;
@@ -446,25 +446,20 @@ AkinatorStatus RunCharacteristic(NodeAllocator_t*      node_allocator,
 
 //===================================================================//
 
-AkinatorStatus PrintHeroCharacteristic(std::stack<Answer_t>* stk, size_t level)
+AkinatorStatus PrintHeroCharacteristic(std::stack<Answer_t>* stk, Node_t* hero_node)
 {
     ASSERT(stk);
 
     bool positive_answer = true;
 
-    ColorPrint(TurquoiseColor, "%s это ", ((*stk).top()).node->data.str);
+    ColorPrint(TurquoiseColor, "%s это ", hero_node->data.str);
 
-    (*stk).pop();
-
-    while (level != 0)
+    while (!stk->empty())
     {
         Answer_t cur_answer = (*stk).top();
-
         (*stk).pop();
 
         ColorPrint(TurquoiseColor, "%s%s ", cur_answer.is_positive ? "" : "не ", cur_answer.node->data.str);
-
-        level--;
     }
 
     putchar('\n');
@@ -537,17 +532,68 @@ AkinatorStatus RunDifference(NodeAllocator_t*      node_allocator,
 AkinatorStatus PrintHeroesDiffernce(NodeAllocator_t*      node_allocator,
                                     std::stack<Answer_t>* stk1,
                                     std::stack<Answer_t>* stk2,
-                                    Node_t*               hero1,
-                                    Node_t*               hero2)
+                                    Node_t*               hero1_node,
+                                    Node_t*               hero2_node)
 {
     ASSERT(node_allocator);
     ASSERT(stk1);
     ASSERT(stk2);
-    ASSERT(hero1);
-    ASSERT(hero2);
+    ASSERT(hero1_node);
+    ASSERT(hero2_node);
 
-    PrintHeroCharacteristic(stk1, hero1->level);
-    PrintHeroCharacteristic(stk2, hero2->level);
+    Answer_t hero1_charac = stk1->top();
+    Answer_t hero2_charac = stk2->top();
+
+    if (hero1_charac.is_positive != hero2_charac.is_positive)
+    {
+        ColorPrint(TurquoiseColor, "These heroes have nothing in common\n");
+
+        VERIFY(PrintHeroCharacteristic(stk1, hero1_node),
+               return AKINATOR_PRINT_HERO_CHARACTERISTIC_ERROR);
+        VERIFY(PrintHeroCharacteristic(stk2, hero2_node),
+               return AKINATOR_PRINT_HERO_CHARACTERISTIC_ERROR);
+
+        return AKINATOR_SUCCESS;
+    }
+
+    ColorPrint(TurquoiseColor, "%s и %s ",
+               hero1_node->data.str,
+               hero2_node->data.str);
+
+    stk1->pop();
+    stk2->pop();
+
+    while (hero1_charac.is_positive == hero2_charac.is_positive)
+    {
+        ASSERT(!stk1->empty());
+        ASSERT(!stk2->empty());
+
+        ColorPrint(TurquoiseColor, "%s%s ",
+                   hero1_charac.is_positive ? "" : "не ",
+                   hero1_charac.node->data.str);
+
+        hero1_charac = stk1->top();
+        stk1->pop();
+
+        hero2_charac = stk2->top();
+        stk2->pop();
+    }
+
+    putchar('\n');
+
+    if (!stk1->empty())
+    {
+        ColorPrint(TurquoiseColor, "Но ");
+
+        PrintHeroCharacteristic(stk1, hero1_node);
+    }
+
+    if (!stk2->empty())
+    {
+        ColorPrint(TurquoiseColor, "А ");
+
+        PrintHeroCharacteristic(stk2, hero2_node);
+    }
 
     return AKINATOR_SUCCESS;
 }

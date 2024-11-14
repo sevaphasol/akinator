@@ -25,5 +25,7 @@ elem17->elem19[label = " нет "];elem19[shape="Mrecord", label= "{Ведёт �
 elem19->elem20[label = " да "];elem20[shape="Mrecord", label= "{Ведёт прогу на РТ и СП? | parent = Ведёт прогу | is_left_to_parent = true | level = 4}"];
 elem20->elem21[label = " да "];elem21[shape="Mrecord", label= "{ДЕД | parent = Ведёт прогу на РТ и СП | is_left_to_parent = true | level = 5}"];
 elem20->elem22[label = " нет "];elem22[shape="Mrecord", label= "{Хз кто | parent = Ведёт прогу на РТ и СП | is_left_to_parent = false | level = 5}"];
-elem19->elem23[label = " нет "];elem23[shape="Mrecord", label= "{Киреев | parent = Ведёт прогу | is_left_to_parent = false | level = 4}"];
+elem19->elem23[label = " нет "];elem23[shape="Mrecord", label= "{huy? | parent = Ведёт прогу | is_left_to_parent = false | level = 4}"];
+elem23->elem24[label = " да "];elem24[shape="Mrecord", label= "{dalbaeb | parent = huy | is_left_to_parent = true | level = 5}"];
+elem23->elem25[label = " нет "];elem25[shape="Mrecord", label= "{Киреев | parent = huy | is_left_to_parent = false | level = 5}"];
 }
