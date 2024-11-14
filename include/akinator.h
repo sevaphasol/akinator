@@ -41,6 +41,7 @@ enum AkinatorStatus
     AKINATOR_NO_ANSWER_FOUND,
     AKINATOR_PRINT_HERO_CHARACTERISTIC_ERROR,
     AKINATOR_PUSH_HERO_CHARACTERISTIC_ERROR,
+    AKINATOR_DUMP_ERROR,
 };
 
 //————————————————————————————————————————————————//

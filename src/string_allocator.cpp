@@ -1,16 +1,16 @@
 #include <stdlib.h>
 
-//------------------------------------------------//
+//-------------------------------------------------------------------//
 
 #include "string_allocator.h"
 #include "custom_assert.h"
 
-//————————————————————————————————————————————————//
+//———————————————————————————————————————————————————————————————————//
 
 static StringAllocatorStatus BigArrayRealloc (StringAllocator_t* string_allocator);
-static StringAllocatorStatus ArrayCalloc     (StringAllocator_t* string_allocator);
+static StringAllocatorStatus ArraysCalloc    (StringAllocator_t* string_allocator);
 
-//————————————————————————————————————————————————//
+//———————————————————————————————————————————————————————————————————//
 
 StringAllocatorStatus StringAllocatorCtor(StringAllocator_t* string_allocator,
                                           size_t n_arrays,
@@ -19,15 +19,15 @@ StringAllocatorStatus StringAllocatorCtor(StringAllocator_t* string_allocator,
     VERIFY(!string_allocator,
            return STRING_ALLOCATOR_STRUCT_NULL_PTR_ERROR);
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     string_allocator->n_arrays  = n_arrays;
 
-    string_allocator->big_array = (String_t**) calloc(n_arrays, sizeof(String_t**)); // buffer char**
+    string_allocator->big_array = (String_t**) calloc(n_arrays, sizeof(String_t**));                                                                            // buffer char**
     VERIFY(!string_allocator->big_array,
            return STRING_ALLOCATORE_STD_CALLOC_ERROR);
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     string_allocator->n_strings_in_array = n_strings_in_array;
 
@@ -41,19 +41,19 @@ StringAllocatorStatus StringAllocatorCtor(StringAllocator_t* string_allocator,
 
     string_allocator->free_place = 0;
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     return STRING_ALLOCATOR_SUCCESS;
 }
 
-//================================================//
+//===================================================================//
 
 StringAllocatorStatus StringAllocatorDtor(StringAllocator_t* string_allocator)
 {
     VERIFY(!string_allocator,
            return STRING_ALLOCATOR_STRUCT_NULL_PTR_ERROR);
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     for (int i = 0; i < string_allocator->n_arrays; i++)
     {
@@ -66,12 +66,12 @@ StringAllocatorStatus StringAllocatorDtor(StringAllocator_t* string_allocator)
     string_allocator->n_arrays           = 0;
     string_allocator->n_strings_in_array = 0;
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     return STRING_ALLOCATOR_SUCCESS;
 }
 
-//================================================//
+//===================================================================//
 
 StringAllocatorStatus GetStrPtr(StringAllocator* string_allocator, char** ptr)
 {
@@ -82,18 +82,18 @@ StringAllocatorStatus GetStrPtr(StringAllocator* string_allocator, char** ptr)
            return STRING_ALLOCATOR_INVALID_NEW_STRING_ERROR);
 
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     if (string_allocator->free_place >= string_allocator->n_arrays * string_allocator->n_strings_in_array)
     {
         VERIFY(BigArrayRealloc(string_allocator),
                return STRING_ALLOCATOR_BIG_ARRAY_REALLOC_ERROR);
 
-        VERIFY(ArrayCalloc(string_allocator),
+        VERIFY(ArraysCalloc(string_allocator),
                return STRING_ALLOCATOR_ARRAYS_CALLOC_ERROR);
     }
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     size_t cur_array      = string_allocator->free_place / string_allocator->n_strings_in_array;
     size_t rel_free_place = string_allocator->free_place % string_allocator->n_strings_in_array;
@@ -102,23 +102,23 @@ StringAllocatorStatus GetStrPtr(StringAllocator* string_allocator, char** ptr)
 
     string_allocator->free_place++;
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     return STRING_ALLOCATOR_SUCCESS;
 }
 
-//================================================//
+//===================================================================//
 
 StringAllocatorStatus BigArrayRealloc(StringAllocator_t* string_allocator)
 {
     return STRING_ALLOCATOR_SUCCESS;
 }
 
-//================================================//
+//===================================================================//
 
-StringAllocatorStatus ArrayCalloc(StringAllocator_t* string_allocator)
+StringAllocatorStatus ArraysCalloc(StringAllocator_t* string_allocator)
 {
     return STRING_ALLOCATOR_SUCCESS;
 }
 
-//————————————————————————————————————————————————//
+//———————————————————————————————————————————————————————————————————//

@@ -14,7 +14,7 @@
 
 #define LOGS_DIR "logs"
 #define DOTS_DIR "dot_files"
-#define PNGS_DIR "images"
+#define IMGS_DIR "images"
 
 //————————————————————————————————————————————————//
 

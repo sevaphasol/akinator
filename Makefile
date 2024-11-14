@@ -1,9 +1,9 @@
 CC = g++
-CFLAGS = -g -I include -fPIE -I stack/include -Wcast-qual -Wconversion -Wctor-dtor-privacy \
-		 -Wempty-body -Wformat-security -Wformat=2 -Wignored-qualifiers -Wlogical-op 	   \
-         -Wno-missing-field-initializers -Wnon-virtual-dtor -Woverloaded-virtual     	   \
-		 -Wpointer-arith -Wsign-promo -Wstack-usage=8192 -Wstrict-aliasing           	   \
-		 -Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -fexceptions -pipe     	   \
+CFLAGS = -g -I include -I stack/include -Wcast-qual -Wconversion -Wctor-dtor-privacy \
+		 -Wempty-body -Wformat-security -Wformat=2 -Wignored-qualifiers -Wlogical-op \
+         -Wno-missing-field-initializers -Wnon-virtual-dtor -Woverloaded-virtual     \
+		 -Wpointer-arith -Wsign-promo -Wstack-usage=8192 -Wstrict-aliasing           \
+		 -Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -fexceptions -pipe     \
 
 LDFLAGS =
 
@@ -13,8 +13,6 @@ BUILD_DIR     = build
 LOGS_DIR 	  = logs
 DOT_FILES_DIR = $(LOGS_DIR)/dot_files
 IMAGES_DIR    = $(LOGS_DIR)/images
-
-STACK_OBJECTS = stack/bin/stack.o stack/bin/allocation.o
 
 EXECUTABLE 	  = akinator
 EXECUTABLE_PATH = $(BUILD_DIR)/$(EXECUTABLE)
@@ -34,7 +32,7 @@ $(OBJECTS_DIR):
 	mkdir -p $(IMAGES_DIR)
 
 $(EXECUTABLE_PATH): $(OBJECT_FILES) $(BUILD_DIR)
-	$(CC) $(LDFLAGS) $(OBJECT_FILES) $(STACK_OBJECTS) -o $@
+	$(CC) $(LDFLAGS) $(OBJECT_FILES) -o $@
 
 $(OBJECTS_DIR)/%.o: $(SOURCES_DIR)/%.cpp $(OBJECTS_DIR)
 	$(CC) -c $(CFLAGS) $< -o $@

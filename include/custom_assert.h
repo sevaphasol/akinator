@@ -18,7 +18,7 @@ if (!condition)                                                           \
 }                                                                         \
 
 /* Provided for reducing code size of checks in functions */
-#define VERIFY(condition, action)                                         \
+#define VERIFY(condition, action)                                          \
 if (condition)                                                            \
 {                                                                         \
     fprintf(stderr, "%s in %s:%d:%s\n",                                   \

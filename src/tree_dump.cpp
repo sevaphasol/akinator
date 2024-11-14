@@ -2,24 +2,24 @@
 #include <string.h>
 #include <syscall.h>
 
-//------------------------------------------------//
+//-------------------------------------------------------------------//
 
 #include "tree_dump.h"
 #include "akinator.h"
 #include "custom_assert.h"
 
-//————————————————————————————————————————————————//
+//———————————————————————————————————————————————————————————————————//
 
 static TreeDumpStatus RecursivelyMakeDotNode (Node_t* node, FILE* file, int* node_number);
 
-//————————————————————————————————————————————————//
+//———————————————————————————————————————————————————————————————————//
 
 TreeDumpStatus Dump(Node_t* root, const char* file_name)
 {
     VERIFY(!root,
            return TREE_DUMP_STRUCT_NULL_PTR_ERROR);
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     char dot_file_name[FileNameBufSize] = {};
     snprintf(dot_file_name, FileNameBufSize, LOGS_DIR "/" DOTS_DIR "/" "%s.dot", file_name);
@@ -39,7 +39,7 @@ TreeDumpStatus Dump(Node_t* root, const char* file_name)
                       EdgeColor, EdgeFontColor,
                       BackGroundColor);
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     int node_number = 1;
     RecursivelyMakeDotNode(root, dot_file, &node_number);
@@ -47,10 +47,10 @@ TreeDumpStatus Dump(Node_t* root, const char* file_name)
     fputs("}\n", dot_file);
     fclose(dot_file);
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     char png_file_name[FileNameBufSize] = {};
-    snprintf(png_file_name, FileNameBufSize, LOGS_DIR "/" PNGS_DIR "/" "%s.png", file_name);
+    snprintf(png_file_name, FileNameBufSize, LOGS_DIR "/" IMGS_DIR "/" "%s.png", file_name);
 
     char command[SysCommandBufSize] = {};
     snprintf(command, SysCommandBufSize, "touch %s; dot %s -Tpng -o %s",
@@ -58,12 +58,12 @@ TreeDumpStatus Dump(Node_t* root, const char* file_name)
 
     system(command);
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     return TREE_DUMP_SUCCESS;
 }
 
-//================================================//
+//===================================================================//
 
 TreeDumpStatus RecursivelyMakeDotNode(Node_t* node, FILE* file, int* node_number)
 {
@@ -72,7 +72,7 @@ TreeDumpStatus RecursivelyMakeDotNode(Node_t* node, FILE* file, int* node_number
     ASSERT(file);
     ASSERT(node_number);
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     fprintf(file, "elem%d["
                     "shape=\"Mrecord\", "
@@ -84,7 +84,7 @@ TreeDumpStatus RecursivelyMakeDotNode(Node_t* node, FILE* file, int* node_number
                     node->left_to_parent ? "true" : "false",
                     node->level);
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     int head_node_number = *node_number;
 
@@ -108,9 +108,9 @@ TreeDumpStatus RecursivelyMakeDotNode(Node_t* node, FILE* file, int* node_number
         RecursivelyMakeDotNode(node->right, file, node_number);
     }
 
-    //------------------------------------------------//
+    //-------------------------------------------------------------------//
 
     return TREE_DUMP_SUCCESS;
 }
 
-//————————————————————————————————————————————————//
+//———————————————————————————————————————————————————————————————————//

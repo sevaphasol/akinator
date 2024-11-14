@@ -34,6 +34,12 @@ typedef struct Node
     Node*      right;
 } Node_t;
 
+typedef struct Answer
+{
+    Node_t* node;
+    bool    is_positive;
+} Answer_t;
+
 //------------------------------------------------//
 
 typedef struct NodeAllocator

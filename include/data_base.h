@@ -36,6 +36,8 @@ enum DataBaseStatus
     DB_ALLOCATE_ERROR,
     DB_FILE_OPEN_ERROR,
     DB_DATA_ALLOCATE_ERROR,
+    AKINATOR_PARSE_STRING_ERROR,
+    DB_FORMAT_ERROR,
 };
 
 //————————————————————————————————————————————————//
